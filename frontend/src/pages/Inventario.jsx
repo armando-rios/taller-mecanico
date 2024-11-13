@@ -10,6 +10,7 @@ import {
     XMarkIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
+import DetalleRepuesto from '../components/DetalleRepuesto';
 
 // Extraer el componente Filtros y manejar su propio estado
 const Filtros = ({ onFiltrosChange, categorias }) => {
@@ -55,9 +56,9 @@ const Filtros = ({ onFiltrosChange, categorias }) => {
                             className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                             placeholder="Buscar por nombre o código"
                             value={filtrosLocales.busqueda}
-                            onChange={(e) => handleFiltrosChange({ 
-                                ...filtrosLocales, 
-                                busqueda: e.target.value 
+                            onChange={(e) => handleFiltrosChange({
+                                ...filtrosLocales,
+                                busqueda: e.target.value
                             })}
                         />
                     </div>
@@ -70,9 +71,9 @@ const Filtros = ({ onFiltrosChange, categorias }) => {
                     <select
                         className="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
                         value={filtrosLocales.categoria}
-                        onChange={(e) => handleFiltrosChange({ 
-                            ...filtrosLocales, 
-                            categoria: e.target.value 
+                        onChange={(e) => handleFiltrosChange({
+                            ...filtrosLocales,
+                            categoria: e.target.value
                         })}
                     >
                         <option value="">Todas las categorías</option>
@@ -92,9 +93,9 @@ const Filtros = ({ onFiltrosChange, categorias }) => {
                             type="checkbox"
 
                             checked={filtrosLocales.stockBajo}
-                            onChange={(e) => handleFiltrosChange({ 
-                                ...filtrosLocales, 
-                                stockBajo: e.target.checked 
+                            onChange={(e) => handleFiltrosChange({
+                                ...filtrosLocales,
+                                stockBajo: e.target.checked
                             })}
                             className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
                         />
@@ -124,6 +125,7 @@ export default function Inventario() {
     const [currentRepuesto, setCurrentRepuesto] = useState(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [loading, setLoading] = useState(true);
+    const [selectedRepuesto, setSelectedRepuesto] = useState(null);
 
     const [formData, setFormData] = useState({
         codigo: '',
@@ -161,7 +163,7 @@ export default function Inventario() {
 
             const matchCategoria =
                 !filtros.categoria || repuesto.categoria === filtros.categoria;
-                // !filtros.categoria || repuesto.categoria._id === filtros.categoria;
+            // !filtros.categoria || repuesto.categoria._id === filtros.categoria;
 
             const matchStockBajo =
                 !filtros.stockBajo || repuesto.stock <= repuesto.stockMinimo;
@@ -513,6 +515,12 @@ export default function Inventario() {
                                 </td>
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button
+                                        onClick={() => setSelectedRepuesto(repuesto)}
+                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                    >
+                                        Ver
+                                    </button>
+                                    <button
                                         onClick={() => openEditModal(repuesto)}
                                         className="text-indigo-600 hover:text-indigo-900 mr-4"
                                     >
@@ -525,6 +533,7 @@ export default function Inventario() {
                                         <TrashIcon className="h-5 w-5" />
                                     </button>
                                 </td>
+
                             </tr>
                         ))}
                     </tbody>
@@ -708,9 +717,6 @@ export default function Inventario() {
 
                                         />
                                     </div>
-
-
-
                                     <div className="col-span-2">
 
                                         <label className="block text-sm font-medium text-gray-700">
@@ -733,6 +739,13 @@ export default function Inventario() {
             )}
             {showCategoryModal && (
                 <CategoryModal />
+            )}
+            {selectedRepuesto && (
+                <DetalleRepuesto
+                    repuesto={selectedRepuesto}
+                    onClose={() => setSelectedRepuesto(null)}
+
+                />
             )}
         </div>
     );
