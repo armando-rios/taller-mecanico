@@ -15,7 +15,6 @@ import {
 const Filtros = ({ onFiltrosChange, categorias }) => {
     const [filtrosLocales, setFiltrosLocales] = useState({
         categoria: '',
-
         busqueda: '',
         stockBajo: false
     });
@@ -161,7 +160,8 @@ export default function Inventario() {
                 repuesto.codigo.toLowerCase().includes(filtros.busqueda.toLowerCase());
 
             const matchCategoria =
-                !filtros.categoria || repuesto.categoria._id === filtros.categoria;
+                !filtros.categoria || repuesto.categoria === filtros.categoria;
+                // !filtros.categoria || repuesto.categoria._id === filtros.categoria;
 
             const matchStockBajo =
                 !filtros.stockBajo || repuesto.stock <= repuesto.stockMinimo;
@@ -179,13 +179,6 @@ export default function Inventario() {
         } finally {
             setLoading(false);
         }
-    };
-    const limpiarFiltros = () => {
-        setFiltros({
-            categoria: '',
-            busqueda: '',
-            stockBajo: false
-        });
     };
 
     useEffect(() => {
@@ -273,17 +266,13 @@ export default function Inventario() {
 
     };
 
-    const filteredRepuestos = repuestos.filter(repuesto =>
-        repuesto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-
-        repuesto.codigo.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     // Fetch categorías
 
     const fetchCategorias = async () => {
         try {
             const { data } = await axiosClient.get('/categorias');
+            console.log(data)
             setCategorias(data);
         } catch (error) {
             toast.error('Error al cargar categorías');
