@@ -6,6 +6,8 @@ import {
     PencilIcon,
     TrashIcon,
     PlusIcon,
+    FunnelIcon,
+    XMarkIcon,
     MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 
@@ -17,7 +19,6 @@ export default function Inventario() {
     const [loading, setLoading] = useState(true);
 
     const [formData, setFormData] = useState({
-
         codigo: '',
         nombre: '',
         descripcion: '',
@@ -36,7 +37,27 @@ export default function Inventario() {
         nombre: '',
         descripcion: ''
     });
+    const [filtros, setFiltros] = useState({
+        categoria: '',
+        busqueda: '',
+        stockBajo: false
+    });
 
+    const filtrarRepuestos = () => {
+        return repuestos.filter(repuesto => {
+            const matchBusqueda =
+                repuesto.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()) ||
+                repuesto.codigo.toLowerCase().includes(filtros.busqueda.toLowerCase());
+
+            const matchCategoria =
+                !filtros.categoria || repuesto.categoria._id === filtros.categoria;
+
+            const matchStockBajo =
+                !filtros.stockBajo || repuesto.stock <= repuesto.stockMinimo;
+
+            return matchBusqueda && matchCategoria && matchStockBajo;
+        });
+    };
 
     const fetchRepuestos = async () => {
         try {
@@ -47,8 +68,85 @@ export default function Inventario() {
         } finally {
             setLoading(false);
         }
-
     };
+    const limpiarFiltros = () => {
+        setFiltros({
+            categoria: '',
+            busqueda: '',
+            stockBajo: false
+        });
+    };
+    const Filtros = () => (
+
+        <div className="bg-white p-4 rounded-lg shadow mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Buscar
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Buscar por nombre o código"
+                            value={filtros.busqueda}
+                            onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
+                        />
+                    </div>
+                </div>
+
+                <div className="sm:w-64">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+
+                        Categoría
+                    </label>
+                    <select
+                        className="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        value={filtros.categoria}
+
+                        onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
+                    >
+                        <option value="">Todas las categorías</option>
+                        {categorias.map((categoria) => (
+                            <option key={categoria._id} value={categoria._id}>
+                                {categoria.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+
+                <div className="flex items-end space-x-4">
+                    <div className="flex items-center">
+                        <input
+                            id="stockBajo"
+                            type="checkbox"
+                            checked={filtros.stockBajo}
+                            onChange={(e) => setFiltros({ ...filtros, stockBajo: e.target.checked })}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="stockBajo" className="ml-2 block text-sm text-gray-700">
+                            Stock bajo
+                        </label>
+                    </div>
+
+                    <button
+                        type="button"
+
+                        onClick={limpiarFiltros}
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        <XMarkIcon className="h-4 w-4 mr-1" />
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    );
 
     useEffect(() => {
         fetchRepuestos();
@@ -83,6 +181,7 @@ export default function Inventario() {
 
         } catch (error) {
 
+
             toast.error('Error al eliminar repuesto');
         }
     };
@@ -92,6 +191,7 @@ export default function Inventario() {
             codigo: '',
             nombre: '',
             descripcion: '',
+
             marca: '',
             modelo: '',
             categoria: '',
@@ -118,19 +218,24 @@ export default function Inventario() {
             modelo: repuesto.modelo || '',
 
             categoria: repuesto.categoria,
+
             precio: repuesto.precio,
+
             stock: repuesto.stock,
             stockMinimo: repuesto.stockMinimo,
 
             ubicacion: repuesto.ubicacion || '',
             proveedor: repuesto.proveedor || ''
         });
+
         setIsModalOpen(true);
+
 
     };
 
     const filteredRepuestos = repuestos.filter(repuesto =>
         repuesto.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
+
         repuesto.codigo.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -153,6 +258,7 @@ export default function Inventario() {
     // Manejador para crear categoría
     const handleCreateCategoria = async (e) => {
         e.preventDefault();
+
         try {
             await axiosClient.post('/categorias', categoriaForm);
             toast.success('Categoría creada exitosamente');
@@ -166,6 +272,7 @@ export default function Inventario() {
     // En el formulario de repuesto, reemplaza el input de categoría por:
     const CategorySelect = () => (
         <div>
+
 
             <div className="flex justify-between items-center mb-2">
                 <label className="block text-sm font-medium text-gray-700">
@@ -211,6 +318,7 @@ export default function Inventario() {
             try {
                 await axiosClient.post('/categorias', formState);
                 toast.success('Categoría creada exitosamente');
+
                 setShowCategoryModal(false);
                 fetchCategorias();
 
@@ -219,6 +327,7 @@ export default function Inventario() {
                 toast.error(error.response?.data?.message || 'Error al crear categoría');
             }
         };
+
 
         return (
             <div className="fixed z-10 inset-0 overflow-y-auto">
@@ -233,6 +342,7 @@ export default function Inventario() {
                                     <label className="block text-sm font-medium text-gray-700">
                                         Nombre de la Categoría
                                     </label>
+
                                     <input
                                         type="text"
 
@@ -260,9 +370,11 @@ export default function Inventario() {
                                             descripcion: e.target.value
                                         })}
                                     ></textarea>
+
                                 </div>
                             </div>
                             <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3">
+
                                 <button
                                     type="submit"
                                     className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
@@ -280,6 +392,7 @@ export default function Inventario() {
 
                             </div>
                         </form>
+
                     </div>
                 </div>
             </div>
@@ -290,6 +403,7 @@ export default function Inventario() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <div>
+
 
                     <h1 className="text-2xl font-semibold text-gray-900">Inventario</h1>
                     <p className="mt-1 text-sm text-gray-500">
@@ -308,6 +422,29 @@ export default function Inventario() {
                     Nuevo Repuesto
                 </button>
             </div>
+            <Filtros />
+            {(filtros.categoria || filtros.busqueda || filtros.stockBajo) && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+
+                    <FunnelIcon className="h-4 w-4" />
+                    <span>Filtros activos:</span>
+                    {filtros.categoria && (
+                        <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">
+                            {categorias.find(c => c._id === filtros.categoria)?.nombre}
+                        </span>
+                    )}
+                    {filtros.busqueda && (
+                        <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">
+                            Búsqueda: {filtros.busqueda}
+                        </span>
+                    )}
+                    {filtros.stockBajo && (
+                        <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full text-xs">
+                            Stock bajo
+                        </span>
+                    )}
+                </div>
+            )}
 
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -325,25 +462,23 @@ export default function Inventario() {
 
             <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Código</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Marca</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
-                            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-
-                        </tr>
-                    </thead>
+                    {/* ... thead existente ... */}
                     <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredRepuestos.map((repuesto) => (
+                        {filtrarRepuestos().map((repuesto) => (
+                            // ... contenido de la fila existente ...
                             <tr key={repuesto._id}>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{repuesto.codigo}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{repuesto.nombre}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{repuesto.marca}</td>
-                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
 
+                                    {repuesto.codigo}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {repuesto.nombre}
+
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {repuesto.marca}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${repuesto.stock <= repuesto.stockMinimo
                                         ? 'bg-red-100 text-red-800'
                                         : 'bg-green-100 text-green-800'
@@ -354,12 +489,14 @@ export default function Inventario() {
                                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     ${repuesto.precio.toLocaleString()}
                                 </td>
-                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
 
+                                    {categorias.find(c => c._id === repuesto.categoria)?.nombre}
+                                </td>
+                                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button
                                         onClick={() => openEditModal(repuesto)}
                                         className="text-indigo-600 hover:text-indigo-900 mr-4"
-
                                     >
                                         <PencilIcon className="h-5 w-5" />
                                     </button>
@@ -367,7 +504,6 @@ export default function Inventario() {
                                         onClick={() => handleDelete(repuesto._id)}
                                         className="text-red-600 hover:text-red-900"
                                     >
-
                                         <TrashIcon className="h-5 w-5" />
                                     </button>
                                 </td>
@@ -376,11 +512,11 @@ export default function Inventario() {
                     </tbody>
                 </table>
             </div>
-
             {/* Modal para crear/editar repuesto */}
             {isModalOpen && (
 
                 <div className="fixed z-10 inset-0 overflow-y-auto">
+
                     <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                         <div className="fixed inset-0 transition-opacity" aria-hidden="true">
                             <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
@@ -388,6 +524,7 @@ export default function Inventario() {
                         <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
                             <form onSubmit={handleSubmit}>
                                 <div className="space-y-4">
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
                                             Código
@@ -401,6 +538,7 @@ export default function Inventario() {
                                         />
                                     </div>
                                     {/* Añadir campos similares para el resto de atributos */}
+
                                 </div>
                                 <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3">
                                     <button
@@ -417,12 +555,14 @@ export default function Inventario() {
                                         className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
                                     >
 
+
                                         Cancelar
                                     </button>
                                 </div>
 
                                 {/* Campos del formulario */}
                                 <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2 mt-4">
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
                                             Nombre
@@ -437,11 +577,13 @@ export default function Inventario() {
                                     </div>
 
 
+
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
                                             Marca
                                         </label>
                                         <input
+
 
                                             type="text"
                                             required
@@ -450,6 +592,7 @@ export default function Inventario() {
                                             onChange={(e) => setFormData({ ...formData, marca: e.target.value })}
                                         />
                                     </div>
+
 
 
                                     <div>
@@ -470,6 +613,7 @@ export default function Inventario() {
 
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700">
+
                                             Precio
                                         </label>
                                         <input
@@ -505,6 +649,7 @@ export default function Inventario() {
                                             type="number"
                                             required
 
+
                                             min="0"
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
 
@@ -517,7 +662,9 @@ export default function Inventario() {
                                         <label className="block text-sm font-medium text-gray-700">
                                             Ubicación
 
+
                                         </label>
+
                                         <input
                                             type="text"
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -533,13 +680,17 @@ export default function Inventario() {
                                         </label>
                                         <input
                                             type="text"
+
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+
 
                                             value={formData.proveedor}
                                             onChange={(e) => setFormData({ ...formData, proveedor: e.target.value })}
 
+
                                         />
                                     </div>
+
 
 
                                     <div className="col-span-2">
