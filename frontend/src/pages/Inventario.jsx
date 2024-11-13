@@ -11,6 +11,114 @@ import {
     MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 
+// Extraer el componente Filtros y manejar su propio estado
+const Filtros = ({ onFiltrosChange, categorias }) => {
+    const [filtrosLocales, setFiltrosLocales] = useState({
+        categoria: '',
+
+        busqueda: '',
+        stockBajo: false
+    });
+
+    // Manejar cambios y propagar al componente padre
+    const handleFiltrosChange = (newFiltros) => {
+        setFiltrosLocales(newFiltros);
+        onFiltrosChange(newFiltros);
+    };
+
+
+    const limpiarFiltros = () => {
+        const filtrosLimpios = {
+            categoria: '',
+            busqueda: '',
+            stockBajo: false
+        };
+        setFiltrosLocales(filtrosLimpios);
+        onFiltrosChange(filtrosLimpios);
+    };
+
+
+    return (
+
+        <div className="bg-white p-4 rounded-lg shadow mb-6">
+            <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Buscar
+                    </label>
+                    <div className="relative rounded-md shadow-sm">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                        </div>
+                        <input
+
+                            type="text"
+                            className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                            placeholder="Buscar por nombre o código"
+                            value={filtrosLocales.busqueda}
+                            onChange={(e) => handleFiltrosChange({ 
+                                ...filtrosLocales, 
+                                busqueda: e.target.value 
+                            })}
+                        />
+                    </div>
+                </div>
+
+                <div className="sm:w-64">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Categoría
+                    </label>
+                    <select
+                        className="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
+                        value={filtrosLocales.categoria}
+                        onChange={(e) => handleFiltrosChange({ 
+                            ...filtrosLocales, 
+                            categoria: e.target.value 
+                        })}
+                    >
+                        <option value="">Todas las categorías</option>
+                        {categorias.map((categoria) => (
+                            <option key={categoria._id} value={categoria._id}>
+                                {categoria.nombre}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div className="flex items-end space-x-4">
+                    <div className="flex items-center">
+                        <input
+                            id="stockBajo"
+
+                            type="checkbox"
+
+                            checked={filtrosLocales.stockBajo}
+                            onChange={(e) => handleFiltrosChange({ 
+                                ...filtrosLocales, 
+                                stockBajo: e.target.checked 
+                            })}
+                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+                        />
+                        <label htmlFor="stockBajo" className="ml-2 block text-sm text-gray-700">
+                            Stock bajo
+                        </label>
+                    </div>
+
+
+                    <button
+                        type="button"
+                        onClick={limpiarFiltros}
+                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    >
+                        <XMarkIcon className="h-4 w-4 mr-1" />
+                        Limpiar
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function Inventario() {
     const [repuestos, setRepuestos] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -42,6 +150,9 @@ export default function Inventario() {
         busqueda: '',
         stockBajo: false
     });
+    const handleFiltrosChange = (nuevosFiltros) => {
+        setFiltros(nuevosFiltros);
+    };
 
     const filtrarRepuestos = () => {
         return repuestos.filter(repuesto => {
@@ -76,77 +187,6 @@ export default function Inventario() {
             stockBajo: false
         });
     };
-    const Filtros = () => (
-
-        <div className="bg-white p-4 rounded-lg shadow mb-6">
-            <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Buscar
-                    </label>
-                    <div className="relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            className="block w-full pl-10 sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                            placeholder="Buscar por nombre o código"
-                            value={filtros.busqueda}
-                            onChange={(e) => setFiltros({ ...filtros, busqueda: e.target.value })}
-                        />
-                    </div>
-                </div>
-
-                <div className="sm:w-64">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-
-                        Categoría
-                    </label>
-                    <select
-                        className="block w-full sm:text-sm border-gray-300 rounded-md focus:ring-indigo-500 focus:border-indigo-500"
-                        value={filtros.categoria}
-
-                        onChange={(e) => setFiltros({ ...filtros, categoria: e.target.value })}
-                    >
-                        <option value="">Todas las categorías</option>
-                        {categorias.map((categoria) => (
-                            <option key={categoria._id} value={categoria._id}>
-                                {categoria.nombre}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-
-
-                <div className="flex items-end space-x-4">
-                    <div className="flex items-center">
-                        <input
-                            id="stockBajo"
-                            type="checkbox"
-                            checked={filtros.stockBajo}
-                            onChange={(e) => setFiltros({ ...filtros, stockBajo: e.target.checked })}
-                            className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                        />
-                        <label htmlFor="stockBajo" className="ml-2 block text-sm text-gray-700">
-                            Stock bajo
-                        </label>
-                    </div>
-
-                    <button
-                        type="button"
-
-                        onClick={limpiarFiltros}
-                        className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
-                        <XMarkIcon className="h-4 w-4 mr-1" />
-                        Limpiar
-                    </button>
-                </div>
-            </div>
-        </div>
-
-    );
 
     useEffect(() => {
         fetchRepuestos();
@@ -422,7 +462,10 @@ export default function Inventario() {
                     Nuevo Repuesto
                 </button>
             </div>
-            <Filtros />
+            <Filtros
+                onFiltrosChange={handleFiltrosChange}
+                categorias={categorias}
+            />
             {(filtros.categoria || filtros.busqueda || filtros.stockBajo) && (
                 <div className="flex items-center gap-2 text-sm text-gray-600">
 
@@ -445,20 +488,6 @@ export default function Inventario() {
                     )}
                 </div>
             )}
-
-            <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                    type="text"
-                    placeholder="Buscar repuestos..."
-                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                />
-            </div>
-
 
             <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
                 <table className="min-w-full divide-y divide-gray-200">
