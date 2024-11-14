@@ -162,7 +162,7 @@ export default function Inventario() {
                 repuesto.codigo.toLowerCase().includes(filtros.busqueda.toLowerCase());
 
             const matchCategoria =
-                !filtros.categoria || repuesto.categoria === filtros.categoria;
+                !filtros.categoria || repuesto.categoria._id === filtros.categoria;
             // !filtros.categoria || repuesto.categoria._id === filtros.categoria;
 
             const matchStockBajo =
