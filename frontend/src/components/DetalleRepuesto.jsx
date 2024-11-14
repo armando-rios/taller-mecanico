@@ -84,11 +84,6 @@ export default function DetalleRepuesto({ repuesto, onClose }) {
                                         <p className="mt-1 text-sm text-gray-900">{repuesto.stockMinimo} unidades</p>
                                     </div>
 
-                                    <div>
-                                        <p className="text-sm font-medium text-gray-500">Categoría</p>
-                                        <p className="mt-1 text-sm text-gray-900">{repuesto.categoria?.nombre}</p>
-                                    </div>
-
                                     <div className="col-span-2">
                                         <p className="text-sm font-medium text-gray-500">Ubicación</p>
                                         <p className="mt-1 text-sm text-gray-900">{repuesto.ubicacion}</p>

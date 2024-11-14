@@ -35,7 +35,7 @@ export default function Navbar() {
                                         Taller Mecánico
                                     </span>
                                 </div>
-                                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                                <div className="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
                                     {navigation.map((item) => (
                                         <Link
                                             key={item.name}

@@ -4,6 +4,8 @@ const Venta = require('../models/Venta');
 exports.getRepuestos = async (req, res) => {
     try {
         const repuestos = await Repuesto.find()
+            .populate('categoria', 'nombre')
+        // .populate('categoria', 'nombre')
         res.json(repuestos);
     } catch (error) {
         res.status(500).json({
