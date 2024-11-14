@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 const navigation = [
     { name: 'Dashboard', href: '/' },
     { name: 'Inventario', href: '/inventario' },
-    { name: 'Ventas', href: '/ventas' }
+    { name: 'Ventas', href: '/ventas' },
+    { name: 'Clientes', href: '/clientes' }
 ];
 
 export default function Navbar() {

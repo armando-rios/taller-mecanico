@@ -8,6 +8,8 @@ import Inventario from './pages/Inventario';
 import Ventas from './pages/Ventas';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import Clientes from './pages/Clientes';
+import DetalleCliente from './pages/DetalleCliente';
 
 
 const Layout = () => {
@@ -39,6 +41,8 @@ function App() {
                             <Route index element={<Dashboard />} />
                             <Route path="inventario" element={<Inventario />} />
                             <Route path="ventas" element={<Ventas />} />
+                            <Route path="clientes" element={<Clientes />} />
+                            <Route path="clientes/:id" element={<DetalleCliente />} />
                         </Route>
                     </Routes>
                 </div>
