@@ -12,7 +12,6 @@ const { protect, admin } = require('../middleware/authMiddleware');
 
 router.get('/stats', protect, getStats);
 
-
 router.route('/')
     .get(protect, getRepuestos)
     .post(protect, admin, createRepuesto);

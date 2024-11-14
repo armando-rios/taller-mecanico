@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Card, Title, AreaChart, DonutChart, BarList } from '@tremor/react';
 import {
     CurrencyDollarIcon,
-
     ArchiveBoxIcon,
     ExclamationTriangleIcon,
     ChartPieIcon
