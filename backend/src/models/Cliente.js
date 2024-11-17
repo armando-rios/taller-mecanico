@@ -5,7 +5,6 @@ const vehiculoSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-
     modelo: {
         type: String,
         required: true
@@ -14,10 +13,10 @@ const vehiculoSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
+
     placa: {
         type: String,
-        required: true,
-        unique: true
+        required: true
     },
     color: String,
     kilometraje: Number,
@@ -33,30 +32,36 @@ const vehiculoSchema = new mongoose.Schema({
     },
     vin: {
         type: String,
-        unique: true,
         sparse: true
     }
+}, {
+    timestamps: true,
+    _id: true  // Asegurarnos de que cada vehículo tenga su propio _id
 });
-
+// En el modelo Cliente.js, actualizar historialServicioSchema
 const historialServicioSchema = new mongoose.Schema({
     fecha: {
         type: Date,
         required: true
     },
+    vehiculo: {
+        type: String,  // ID del vehículo del cliente
+
+        required: true
+    },
     tipo: {
         type: String,
         required: true,
-
         enum: ['Mantenimiento', 'Reparación', 'Diagnóstico', 'Emergencia']
     },
     descripcion: {
         type: String,
-        required: true
+        required: false
+
     },
     estado: {
         type: String,
         required: true,
-
         enum: ['Pendiente', 'En Proceso', 'Completado', 'Cancelado'],
         default: 'Pendiente'
     },
@@ -69,12 +74,27 @@ const historialServicioSchema = new mongoose.Schema({
             ref: 'Repuesto'
         },
         cantidad: Number,
-        precio: Number
+        precio: Number,
+        subtotal: Number
     }],
-    costoManoObra: Number,
-    costoRepuestos: Number,
+    costoManoObra: {
 
-    total: Number,
+        type: Number,
+        required: true,
+        default: 0
+    },
+    costoRepuestos: {
+
+        type: Number,
+        required: true,
+        default: 0
+    },
+    total: {
+        type: Number,
+
+        required: true,
+        default: 0
+    },
     tecnico: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -82,7 +102,6 @@ const historialServicioSchema = new mongoose.Schema({
     observaciones: String,
     fechaEntrega: Date
 });
-
 const clienteSchema = new mongoose.Schema({
     nombre: {
         type: String,

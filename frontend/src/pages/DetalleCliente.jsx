@@ -15,6 +15,7 @@ import {
     BoltIcon,
     DocumentChartBarIcon,
     AdjustmentsHorizontalIcon,
+    XMarkIcon,
     CheckCircleIcon,
     IdentificationIcon,
     XCircleIcon
@@ -41,15 +42,36 @@ export default function DetalleCliente() {
     });
 
     const [servicioForm, setServicioForm] = useState({
+        vehiculo: '',
         tipo: 'Mantenimiento',
         descripcion: '',
         kilometraje: '',
         diagnostico: '',
         estado: 'Pendiente',
-        trabajosRealizados: [],
+        trabajosRealizados: [''],
+        repuestosUtilizados: [],
+        costoManoObra: 0,
+        costoRepuestos: 0,
+        total: 0,
         observaciones: '',
         fechaEntrega: ''
     });
+    const [repuestos, setRepuestos] = useState([]);
+    const [repuestoSeleccionado, setRepuestoSeleccionado] = useState({
+        repuesto: '',
+        cantidad: 1,
+        precio: 0
+    });
+
+    const fetchRepuestos = async () => {
+        try {
+            const { data } = await axiosClient.get('/repuestos');
+            setRepuestos(data);
+
+        } catch (error) {
+            toast.error('Error al cargar repuestos');
+        }
+    };
 
     const fetchCliente = async () => {
         try {
@@ -63,11 +85,99 @@ export default function DetalleCliente() {
             setLoading(false);
         }
     };
+    useEffect(() => {
+        if (isServicioModalOpen) {
+            fetchRepuestos();
+        }
+    }, [isServicioModalOpen]);
 
     useEffect(() => {
         fetchCliente();
     }, [id]);
 
+    const handleAddRepuesto = () => {
+        if (!repuestoSeleccionado.repuesto || repuestoSeleccionado.cantidad < 1) {
+            toast.error('Seleccione un repuesto y cantidad válida');
+            return;
+        }
+
+        const repuesto = repuestos.find(r => r._id === repuestoSeleccionado.repuesto);
+        if (repuestoSeleccionado.cantidad > repuesto.stock) {
+            toast.error(`Stock insuficiente. Disponible: ${repuesto.stock}`);
+
+            return;
+        }
+
+        const nuevoRepuesto = {
+            repuesto: repuestoSeleccionado.repuesto,
+            cantidad: repuestoSeleccionado.cantidad,
+
+            precio: repuesto.precio,
+            subtotal: repuesto.precio * repuestoSeleccionado.cantidad
+        };
+
+
+        setServicioForm(prev => ({
+            ...prev,
+            repuestosUtilizados: [...prev.repuestosUtilizados, nuevoRepuesto],
+            costoRepuestos: prev.costoRepuestos + nuevoRepuesto.subtotal,
+
+            total: prev.costoManoObra + prev.costoRepuestos + nuevoRepuesto.subtotal
+        }));
+
+
+        setRepuestoSeleccionado({
+            repuesto: '',
+
+            cantidad: 1,
+            precio: 0
+        });
+    };
+    const handleRemoveRepuesto = (index) => {
+        setServicioForm(prev => {
+
+            const repuestoEliminado = prev.repuestosUtilizados[index];
+            return {
+                ...prev,
+                repuestosUtilizados: prev.repuestosUtilizados.filter((_, i) => i !== index),
+                costoRepuestos: prev.costoRepuestos - repuestoEliminado.subtotal,
+                total: prev.total - repuestoEliminado.subtotal
+            };
+        });
+    };
+    const handleAddTrabajo = () => {
+        setServicioForm(prev => ({
+            ...prev,
+            trabajosRealizados: [...prev.trabajosRealizados, '']
+        }));
+    };
+
+    const handleRemoveTrabajo = (index) => {
+        setServicioForm(prev => ({
+            ...prev,
+
+            trabajosRealizados: prev.trabajosRealizados.filter((_, i) => i !== index)
+        }));
+    };
+
+    const handleTrabajoChange = (index, valor) => {
+        setServicioForm(prev => ({
+            ...prev,
+            trabajosRealizados: prev.trabajosRealizados.map((trabajo, i) =>
+                i === index ? valor : trabajo
+            )
+        }));
+    };
+
+
+    const handleCostoManoObraChange = (valor) => {
+        const costoManoObra = parseFloat(valor) || 0;
+        setServicioForm(prev => ({
+            ...prev,
+            costoManoObra,
+            total: costoManoObra + prev.costoRepuestos
+        }));
+    };
 
     const handleVehiculoSubmit = async (e) => {
         e.preventDefault();
@@ -93,30 +203,86 @@ export default function DetalleCliente() {
     };
 
 
+    // En DetalleCliente.jsx
+
     const handleServicioSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            await axiosClient.post(`/clientes/${id}/servicios`, servicioForm);
+            // Validaciones del lado del cliente
+            if (!servicioForm.vehiculo) {
+                toast.error('Debe seleccionar un vehículo');
+                return;
+
+            }
+
+
+            if (!servicioForm.tipo) {
+                toast.error('Debe seleccionar un tipo de servicio');
+                return;
+
+            }
+
+
+            // Preparar los datos
+            const trabajosLimpios = servicioForm.trabajosRealizados.filter(t => t.trim() !== '');
+
+            const servicioData = {
+
+                vehiculo: servicioForm.vehiculo,
+                tipo: servicioForm.tipo,
+                descripcion: servicioForm.descripcion,
+                kilometraje: servicioForm.kilometraje || 0,
+                diagnostico: servicioForm.diagnostico || '',
+                estado: servicioForm.estado,
+                trabajosRealizados: trabajosLimpios,
+                repuestosUtilizados: servicioForm.repuestosUtilizados.map(item => ({
+                    repuesto: item.repuesto,
+
+                    cantidad: parseInt(item.cantidad),
+                    precio: parseFloat(item.precio)
+                })),
+                costoManoObra: parseFloat(servicioForm.costoManoObra) || 0,
+                costoRepuestos: parseFloat(servicioForm.costoRepuestos) || 0,
+                total: parseFloat(servicioForm.total) || 0,
+
+                observaciones: servicioForm.observaciones || '',
+                fechaEntrega: servicioForm.fechaEntrega || null
+            };
+
+            console.log('Datos a enviar:', servicioData);
+
+            const { data } = await axiosClient.post(`/clientes/${id}/servicios`, servicioData);
+
+            console.log('Respuesta:', data);
+
             toast.success('Servicio registrado exitosamente');
             setIsServicioModalOpen(false);
             setServicioForm({
+                vehiculo: '',
 
                 tipo: 'Mantenimiento',
                 descripcion: '',
                 kilometraje: '',
                 diagnostico: '',
                 estado: 'Pendiente',
-
-                trabajosRealizados: [],
+                trabajosRealizados: [''],
+                repuestosUtilizados: [],
+                costoManoObra: 0,
+                costoRepuestos: 0,
+                total: 0,
                 observaciones: '',
+
                 fechaEntrega: ''
             });
             fetchCliente();
         } catch (error) {
+            console.error('Error completo:', error);
+            console.error('Respuesta del servidor:', error.response?.data);
+
             toast.error(error.response?.data?.message || 'Error al registrar servicio');
         }
     };
-
     const InfoCard = ({ icon: Icon, title, value }) => (
         <div className="flex items-center space-x-3">
             <div className="flex-shrink-0">
@@ -598,8 +764,7 @@ export default function DetalleCliente() {
                             <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
                         </div>
 
-
-                        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+                        <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full sm:p-6">
                             <form onSubmit={handleServicioSubmit}>
                                 <div>
                                     <h3 className="text-lg leading-6 font-medium text-gray-900">
@@ -607,103 +772,206 @@ export default function DetalleCliente() {
                                     </h3>
                                     <p className="mt-1 text-sm text-gray-500">
                                         Registra un nuevo servicio
-
                                     </p>
                                 </div>
 
-
                                 <div className="mt-6 grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-2">
                                     <div>
-
                                         <label className="block text-sm font-medium text-gray-700">
-                                            Tipo de Servicio
+                                            Vehículo
                                         </label>
                                         <select
                                             required
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={servicioForm.tipo}
-                                            onChange={(e) => setServicioForm({ ...servicioForm, tipo: e.target.value })}
+                                            value={servicioForm.vehiculo}
+                                            onChange={(e) => setServicioForm({ ...servicioForm, vehiculo: e.target.value })}
                                         >
-                                            <option value="Mantenimiento">Mantenimiento</option>
-                                            <option value="Reparación">Reparación</option>
-                                            <option value="Diagnóstico">Diagnóstico</option>
-                                            <option value="Emergencia">Emergencia</option>
+
+                                            <option value="">Seleccione un vehículo</option>
+                                            {cliente.vehiculos?.map((vehiculo, index) => (
+                                                <option key={index} value={vehiculo._id}>
+                                                    {vehiculo.marca} {vehiculo.modelo} - {vehiculo.placa}
+                                                </option>
+                                            ))}
                                         </select>
                                     </div>
 
-                                    <div>
+                                    {/* ... (resto de los campos básicos del servicio) ... */}
+
+
+                                    {/* Sección de Trabajos Realizados */}
+                                    <div className="sm:col-span-2">
+
                                         <label className="block text-sm font-medium text-gray-700">
-                                            Kilometraje Actual
+                                            Trabajos a Realizar
                                         </label>
-                                        <input
-                                            type="number"
-                                            min="0"
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={servicioForm.kilometraje}
-                                            onChange={(e) => setServicioForm({ ...servicioForm, kilometraje: e.target.value })}
-                                        />
+
+                                        <div className="mt-2 space-y-2">
+                                            {servicioForm.trabajosRealizados.map((trabajo, index) => (
+                                                <div key={index} className="flex gap-2">
+                                                    <input
+                                                        type="text"
+                                                        className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+
+                                                        value={trabajo}
+
+                                                        onChange={(e) => handleTrabajoChange(index, e.target.value)}
+                                                        placeholder="Describir el trabajo a realizar"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleRemoveTrabajo(index)}
+                                                        className="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                                    >
+                                                        <XMarkIcon className="h-5 w-5" aria-hidden="true" />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={handleAddTrabajo}
+                                                className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
+                                            >
+                                                <PlusIcon className="h-5 w-5 mr-1" />
+                                                Añadir Trabajo
+                                            </button>
+                                        </div>
                                     </div>
 
+                                    {/* Sección de Repuestos */}
                                     <div className="sm:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700">
-                                            Descripción
+                                            Repuestos
                                         </label>
-                                        <textarea
-                                            required
-                                            rows="3"
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={servicioForm.descripcion}
-                                            onChange={(e) => setServicioForm({ ...servicioForm, descripcion: e.target.value })}
-                                        ></textarea>
+                                        <div className="mt-2 grid grid-cols-3 gap-4">
+                                            <select
+                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                value={repuestoSeleccionado.repuesto}
+                                                onChange={(e) => {
+
+                                                    const repuesto = repuestos.find(r => r._id === e.target.value);
+                                                    setRepuestoSeleccionado({
+                                                        repuesto: e.target.value,
+                                                        cantidad: 1,
+                                                        precio: repuesto?.precio || 0
+                                                    });
+                                                }}
+                                            >
+                                                <option value="">Seleccione un repuesto</option>
+                                                {repuestos.map(repuesto => (
+
+                                                    <option key={repuesto._id} value={repuesto._id}>
+                                                        {repuesto.nombre} - Stock: {repuesto.stock}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <input
+                                                type="number"
+                                                min="1"
+                                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                value={repuestoSeleccionado.cantidad}
+                                                onChange={(e) => setRepuestoSeleccionado({
+                                                    ...repuestoSeleccionado,
+                                                    cantidad: parseInt(e.target.value)
+                                                })}
+                                                placeholder="Cantidad"
+                                            />
+
+                                            <button
+                                                type="button"
+                                                onClick={handleAddRepuesto}
+                                                className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700"
+                                            >
+                                                <PlusIcon className="h-5 w-5 mr-1" />
+                                                Añadir
+                                            </button>
+                                        </div>
+
+                                        {/* Lista de repuestos seleccionados */}
+                                        {servicioForm.repuestosUtilizados.length > 0 && (
+
+                                            <div className="mt-4">
+                                                <table className="min-w-full divide-y divide-gray-200">
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Repuesto</th>
+                                                            <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                                                            <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Precio Unit.</th>
+                                                            <th className="px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Subtotal</th>
+                                                            <th className="px-3 py-2"></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-200">
+                                                        {servicioForm.repuestosUtilizados.map((item, index) => {
+                                                            const repuesto = repuestos.find(r => r._id === item.repuesto);
+                                                            return (
+                                                                <tr key={index}>
+                                                                    <td className="px-3 py-2 text-sm text-gray-900">
+                                                                        {repuesto?.nombre}
+                                                                    </td>
+                                                                    <td className="px-3 py-2 text-sm text-gray-900 text-right">
+                                                                        {item.cantidad}
+                                                                    </td>
+                                                                    <td className="px-3 py-2 text-sm text-gray-900 text-right">
+                                                                        ${item.precio.toLocaleString()}
+                                                                    </td>
+                                                                    <td className="px-3 py-2 text-sm text-gray-900 text-right">
+                                                                        ${item.subtotal.toLocaleString()}
+                                                                    </td>
+                                                                    <td className="px-3 py-2 text-right">
+                                                                        <button
+                                                                            type="button"
+                                                                            onClick={() => handleRemoveRepuesto(index)}
+                                                                            className="text-red-600 hover:text-red-900"
+                                                                        >
+                                                                            <XMarkIcon className="h-5 w-5" />
+                                                                        </button>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
                                     </div>
 
-                                    <div className="sm:col-span-2">
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Diagnóstico Preliminar
-                                        </label>
-                                        <textarea
-                                            rows="3"
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                    {/* Sección de Costos */}
+                                    <div className="sm:col-span-2 border-t pt-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
 
-                                            value={servicioForm.diagnostico}
-                                            onChange={(e) => setServicioForm({ ...servicioForm, diagnostico: e.target.value })}
+                                                <label className="block text-sm font-medium text-gray-700">
+                                                    Costo Mano de Obra
+                                                </label>
+                                                <input
+                                                    type="number"
 
-                                        ></textarea>
+                                                    min="0"
+                                                    step="0.01"
+                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                                    value={servicioForm.costoManoObra}
+                                                    onChange={(e) => handleCostoManoObraChange(e.target.value)}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm text-gray-500">Costo Repuestos:</span>
+                                                    <span className="text-sm text-gray-900">${servicioForm.costoRepuestos.toLocaleString()}</span>
+                                                </div>
+                                                <div className="flex justify-between">
+                                                    <span className="text-sm text-gray-500">Mano de Obra:</span>
+                                                    <span className="text-sm text-gray-900">${servicioForm.costoManoObra.toLocaleString()}</span>
+                                                </div>
+                                                <div className="flex justify-between font-medium border-t pt-2">
+                                                    <span className="text-sm text-gray-900">Total:</span>
+                                                    <span className="text-sm text-gray-900">${servicioForm.total.toLocaleString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
 
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Estado
-                                        </label>
-
-                                        <select
-                                            required
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={servicioForm.estado}
-                                            onChange={(e) => setServicioForm({ ...servicioForm, estado: e.target.value })}
-
-                                        >
-                                            <option value="Pendiente">Pendiente</option>
-
-                                            <option value="En Proceso">En Proceso</option>
-                                            <option value="Completado">Completado</option>
-                                            <option value="Cancelado">Cancelado</option>
-                                        </select>
-                                    </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700">
-                                            Fecha Estimada de Entrega
-                                        </label>
-                                        <input
-
-                                            type="datetime-local"
-                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                                            value={servicioForm.fechaEntrega}
-                                            onChange={(e) => setServicioForm({ ...servicioForm, fechaEntrega: e.target.value })}
-                                        />
-                                    </div>
-
+                                    {/* Observaciones y fecha de entrega */}
                                     <div className="sm:col-span-2">
                                         <label className="block text-sm font-medium text-gray-700">
                                             Observaciones
@@ -715,9 +983,39 @@ export default function DetalleCliente() {
                                             onChange={(e) => setServicioForm({ ...servicioForm, observaciones: e.target.value })}
                                         ></textarea>
                                     </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Estado
+                                        </label>
+                                        <select
+                                            required
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            value={servicioForm.estado}
+                                            onChange={(e) => setServicioForm({ ...servicioForm, estado: e.target.value })}
+                                        >
+                                            <option value="Pendiente">Pendiente</option>
+                                            <option value="En Proceso">En Proceso</option>
+                                            <option value="Completado">Completado</option>
+                                            <option value="Cancelado">Cancelado</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700">
+                                            Fecha Estimada de Entrega
+                                        </label>
+                                        <input
+                                            type="datetime-local"
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                                            value={servicioForm.fechaEntrega}
+                                            onChange={(e) => setServicioForm({ ...servicioForm, fechaEntrega: e.target.value })}
+                                        />
+                                    </div>
                                 </div>
 
                                 <div className="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3">
+
                                     <button
                                         type="submit"
                                         className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
@@ -728,6 +1026,7 @@ export default function DetalleCliente() {
                                         type="button"
                                         onClick={() => setIsServicioModalOpen(false)}
                                         className="mt-3 sm:mt-0 inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
+
                                     >
                                         Cancelar
                                     </button>
@@ -735,9 +1034,9 @@ export default function DetalleCliente() {
                             </form>
                         </div>
                     </div>
+
                 </div>
             )}
-
         </div>
     );
 }
