@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast';
 import axiosClient from '../config/axios';
-import { PlusIcon, PrinterIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PrinterIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import DetalleVenta from '../components/DetalleVenta';
 
 export default function Ventas() {
     const [ventas, setVentas] = useState([]);
     const [repuestos, setRepuestos] = useState([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedVenta, setSelectedVenta] = useState(null);
 
     const [loading, setLoading] = useState(true);
 
@@ -167,14 +169,22 @@ export default function Ventas() {
                                         {venta.estado}
                                     </span>
                                 </td>
-
                                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                                     <button
+                                        onClick={() => setSelectedVenta(venta)}
+                                        className="text-indigo-600 hover:text-indigo-900 mr-4"
+                                    >
+                                        Ver
+                                    </button>
+                                    <button
                                         onClick={() => {/* Implementar impresión */ }}
+
                                         className="text-indigo-600 hover:text-indigo-900"
+
                                     >
                                         <PrinterIcon className="h-5 w-5" />
                                     </button>
+
                                 </td>
                             </tr>
                         ))}
@@ -364,6 +374,12 @@ export default function Ventas() {
                         </div>
                     </div>
                 </div>
+            )}
+            {selectedVenta && (
+                <DetalleVenta
+                    venta={selectedVenta}
+                    onClose={() => setSelectedVenta(null)}
+                />
             )}
         </div>
     );

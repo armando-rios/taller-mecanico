@@ -10,6 +10,7 @@ const repuestoRoutes = require('./routes/repuestoRoutes');
 const ventaRoutes = require('./routes/ventaRoutes');
 const setupRoutes = require('./routes/setupRoutes');
 const categoriaRoutes = require('./routes/categoriaRoutes')
+const clienteRoutes = require('./routes/clienteRoutes');
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/api/repuestos', repuestoRoutes);
 app.use('/api/ventas', ventaRoutes);  // <-- Añadido
 app.use('/api/setup', setupRoutes);
 app.use('/api/categorias', categoriaRoutes)
+app.use('/api/clientes', clienteRoutes);
 
 const PORT = process.env.PORT || 5000;
 

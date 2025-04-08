@@ -9,7 +9,8 @@ import { useNavigate } from 'react-router-dom';
 const navigation = [
     { name: 'Dashboard', href: '/' },
     { name: 'Inventario', href: '/inventario' },
-    { name: 'Ventas', href: '/ventas' }
+    { name: 'Ventas', href: '/ventas' },
+    { name: 'Clientes', href: '/clientes' }
 ];
 
 export default function Navbar() {
@@ -35,7 +36,7 @@ export default function Navbar() {
                                         Taller Mecánico
                                     </span>
                                 </div>
-                                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+                                <div className="hidden sm:ml-6 sm:flex items-center sm:space-x-8">
                                     {navigation.map((item) => (
                                         <Link
                                             key={item.name}
