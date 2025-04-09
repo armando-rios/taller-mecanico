@@ -1,8 +1,7 @@
-
 function App() {
 
   return (
-    <>Taller Mecanico</>
+    <h1 className="text-2xl font-bold">Taller Mecanico</h1>
   )
 }
 
