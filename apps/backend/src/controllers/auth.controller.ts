@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken"
 import User from "../models/User.model"
 import { Request, Response } from "express"
-import { Error } from "mongoose"
 
 const generateToken = (id: any) => {
   if (!process.env.JWT_SECRET) {
@@ -81,6 +80,22 @@ export const login = async (req: Request, res: Response) => {
       rol: user.rol,
       token: generateToken(user._id)
     })
+  } catch (error: any) {
+    return res.status(500).json({
+      message: error.message
+    })
+  }
+}
+
+export const getUsers = async (req: Request, res: Response) => {
+  try {
+    const users = await User.find()
+
+    if (!users) {
+      throw new Error("Users not found")
+    }
+
+    return res.status(200).json(users)
   } catch (error: any) {
     return res.status(500).json({
       message: error.message
