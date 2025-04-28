@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 
 interface IUser extends Document {
   name: string;
-  email: string;
+  username: string;
   password: string;
   rol: 'admin' | 'tecnico' | 'vendedor';
   createdAt: Date;
@@ -16,16 +16,14 @@ const userSchema = new Schema<IUser>({
     type: String,
     required: [true, 'Por favor ingrese un nombre']
   },
-  email: {
+  username: {
     type: String,
-    required: [true, 'Por favor ingrese un email'],
+    required: [true, 'Por favor ingrese un nombre de usuario'],
     unique: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Email inválido']
   },
   password: {
     type: String,
     required: [true, 'Por favor ingrese una contraseña'],
-    select: false
   },
   rol: {
     type: String,
