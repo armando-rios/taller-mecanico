@@ -1,8 +1,46 @@
-function App() {
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Outlet,
+} from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Navbar from "./components/Navbar";
+import ProtectedRoute from "./components/ProtectedRoute";
+import Login from "./pages/Login";
+import Home from "./pages/Home";
 
+function Layout() {
   return (
-    <h1 className="text-2xl font-bold">Taller Mecanico</h1>
-  )
+    <>
+      <Navbar />
+      <main className="p-4">
+        <Outlet />
+      </main>
+    </>
+  );
 }
 
-export default App
+function App() {
+  return (
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Home />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
+  );
+}
+
+export default App;
