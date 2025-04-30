@@ -34,7 +34,7 @@ const Navbar = () => {
           </Link>
         ))}
         <button
-          className="text-sm font-semibold cursor-pointer text-gray-300 hover:text-white border border-gray-300 px-2 py-1 rounded-xl"
+          className="text-sm font-semibold cursor-pointer text-gray-300 hover:text-white border border-gray-300 px-2 py-1 rounded-lg"
           onClick={handleLogout}
         >
           Cerrar Sesion
