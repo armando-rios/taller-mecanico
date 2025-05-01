@@ -1,4 +1,4 @@
-import { Document } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface IPart extends Document {
   code: string;
@@ -7,7 +7,7 @@ export interface IPart extends Document {
   brand: string;
   model: string;
   price: number;
-  category: string;
+  category: ObjectId;
   stock: number;
   location: string;
   provider: string;
