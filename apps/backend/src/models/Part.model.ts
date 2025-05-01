@@ -1,25 +1,21 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Schema, model } from 'mongoose';
 import { IPart } from '../interfaces/part.interface';
 
 const partSchema = new Schema<IPart>(
   {
-    code: {
-      type: String,
-      required: [true, 'Por favor ingrese un codigo'],
-    },
     name: {
       type: String,
       required: [true, 'Por favor ingrese un nombre'],
     },
-    description: {
+    code: {
       type: String,
-      required: [true, 'Por favor ingrese una descripcion'],
+      required: [true, 'Por favor ingrese un codigo'],
     },
     brand: {
       type: String,
       required: [true, 'Por favor ingrese una marca'],
     },
-    model: {
+    itemModel: {
       type: String,
       required: [true, 'Por favor ingrese un modelo'],
     },
@@ -31,17 +27,21 @@ const partSchema = new Schema<IPart>(
       type: Number,
       required: [true, 'Por favor ingrese un stock'],
     },
-    location: {
-      type: String,
-      required: [false, 'Por favor ingrese una ubicacion'],
+    category: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: [true, 'Por favor ingrese una categoria'],
     },
     provider: {
       type: String,
       required: [false, 'Por favor ingrese un proveedor'],
     },
-    category: {
+    location: {
       type: String,
-      required: [false, 'Por favor ingrese una categoria'],
+      required: [false, 'Por favor ingrese una ubicacion'],
+    },
+    description: {
+      type: String,
+      required: [false, 'Por favor ingrese una descripcion'],
     },
   },
   {
@@ -49,6 +49,6 @@ const partSchema = new Schema<IPart>(
   },
 );
 
-const Part = model('Parts', partSchema);
+const Part = model<IPart>('Parts', partSchema);
 
 export default Part;
