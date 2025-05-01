@@ -8,7 +8,7 @@ interface RequestWithUser extends Request {
 }
 
 export const protect = async (req: RequestWithUser, res: Response, next: NextFunction) => {
-  let token: string;
+  let token: string | undefined;
 
   if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
     try {
@@ -25,5 +25,10 @@ export const protect = async (req: RequestWithUser, res: Response, next: NextFun
         message: (error as Error).message,
       });
     }
+  }
+
+  if (!token) {
+    res.status(401);
+    throw new Error('Not authorized, no token');
   }
 };
