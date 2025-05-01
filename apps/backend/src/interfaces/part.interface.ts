@@ -5,7 +5,7 @@ export interface IPart extends Document {
   name: string;
   description: string;
   brand: string;
-  model: string;
+  itemModel: string;
   price: number;
   category: ObjectId;
   stock: number;
