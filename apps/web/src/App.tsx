@@ -15,7 +15,7 @@ function Layout() {
   return (
     <>
       <Navbar />
-      <main className="p-4">
+      <main className="p-4 flex-1 flex flex-col h-13/14">
         <Outlet />
       </main>
     </>
