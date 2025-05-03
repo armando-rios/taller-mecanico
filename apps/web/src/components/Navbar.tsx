@@ -17,7 +17,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="flex items-center justify-between p-4">
+    <header className="h-1/14 flex items-center justify-between px-4">
       <h1 className="text-2xl font-bold text-orange-600">Taller Mecanico</h1>
       <nav className="flex gap-4 items-center">
         {navigation.map((item) => (
