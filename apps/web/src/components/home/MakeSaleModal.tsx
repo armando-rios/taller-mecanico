@@ -1,7 +1,21 @@
+import { ChangeEvent, useState } from "react";
+import { Part } from "../../types/invetory";
 import Product from "./Product";
 import SaleCart from "./SaleCart";
 
-const MakeSaleModal = () => {
+const MakeSaleModal = ({ parts }: { parts: Part[] }) => {
+  const [filter, setFilter] = useState("");
+  const [filteredParts, setFilteredParts] = useState(parts);
+  const [partsList, setPartsList] = useState<Part[]>([]);
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setFilter(e.target.value);
+    const filtered = parts.filter((part) =>
+      part.name.toLowerCase().includes(e.target.value.toLowerCase()),
+    );
+    setFilteredParts(filtered);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="bg-neutral-800 rounded-lg shadow-xl w-full max-w-4xl">
@@ -22,6 +36,8 @@ const MakeSaleModal = () => {
                 type="text"
                 placeholder="Buscar producto..."
                 className="flex-grow bg-neutral-700 rounded-l-lg p-2"
+                value={filter}
+                onChange={handleChange}
               />
               <button className="bg-orange-700 px-4 rounded-r-lg">
                 Buscar
@@ -30,12 +46,18 @@ const MakeSaleModal = () => {
 
             <div className="h-64 overflow-y-auto mb-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <Product />
+                {filteredParts.map((part: Part) => (
+                  <Product
+                    key={part._id}
+                    data={part}
+                    setPartsList={setPartsList}
+                  />
+                ))}
               </div>
             </div>
 
             <h4 className="font-medium mb-2">Productos en la venta</h4>
-            <SaleCart />
+            <SaleCart parts={partsList} setPartsList={setPartsList} />
           </div>
           <div className="p-4 md:w-1/3">
             <div className="bg-neutral-700 p-4 rounded-lg mb-4">
