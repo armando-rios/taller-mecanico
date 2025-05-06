@@ -3,7 +3,13 @@ import { Part } from "../../types/invetory";
 import Product from "./Product";
 import SaleCart from "./SaleCart";
 
-const MakeSaleModal = ({ parts }: { parts: Part[] }) => {
+const MakeSaleModal = ({
+  parts,
+  setIsModalOpen,
+}: {
+  parts: Part[];
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}) => {
   const [filter, setFilter] = useState("");
   const [filteredParts, setFilteredParts] = useState(parts);
   const [partsList, setPartsList] = useState<Part[]>([]);
@@ -19,7 +25,7 @@ const MakeSaleModal = ({ parts }: { parts: Part[] }) => {
   return (
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
       <div className="bg-neutral-800 rounded-lg shadow-xl w-full max-w-4xl">
-        <div className="border-b border-neutral-700">
+        <div className="flex justify-between border-b border-neutral-700">
           <div className="flex">
             <button className="px-4 py-4 text-orange-700 border-b-2 border-orange-700">
               Nueva Venta
@@ -28,6 +34,14 @@ const MakeSaleModal = ({ parts }: { parts: Part[] }) => {
               Cliente
             </button>
           </div>
+          <button
+            className="text-gray-400 hover:text-white p-4 font-bold text-xl"
+            onClick={() => {
+              setIsModalOpen(false);
+            }}
+          >
+            ✕
+          </button>
         </div>
         <div className="flex flex-col md:flex-row">
           <div className="p-4 md:w-2/3 border-r border-neutral-700">
