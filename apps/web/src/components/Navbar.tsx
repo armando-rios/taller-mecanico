@@ -18,7 +18,7 @@ const Navbar = () => {
 
   return (
     <header className="h-1/14 flex items-center justify-between px-4">
-      <h1 className="text-2xl font-bold text-orange-600">Taller Mecanico</h1>
+      <h1 className="text-2xl font-bold text-orange-700">Taller Mecanico</h1>
       <nav className="flex gap-4 items-center">
         {navigation.map((item) => (
           <Link
@@ -28,7 +28,7 @@ const Navbar = () => {
               location.pathname === item.href
                 ? "text-orange-600"
                 : "text-gray-300"
-            } hover:text-orange-600 font-semibold`}
+            } hover:text-orange-700 font-semibold`}
           >
             {item.name}
           </Link>
