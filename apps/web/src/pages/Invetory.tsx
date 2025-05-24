@@ -36,6 +36,10 @@ const Invetory = () => {
     setFilteredParts(parts);
   }, []);
 
+  const searchPart = (part: Part, searchTerm: string) =>
+    part.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    part.code.toLowerCase().includes(searchTerm.toLowerCase());
+
   return (
     <>
       <div className="p-4 bg-neutral-800 rounded-lg gap-4 flex flex-col flex-1 h-full">
@@ -56,10 +60,7 @@ const Invetory = () => {
         <Search
           data={parts}
           setFilteredData={setFilteredParts}
-          searchFn={(item, searchTerm) =>
-            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            item.code.toLowerCase().includes(searchTerm.toLowerCase())
-          }
+          searchFn={searchPart}
           placeholder="Buscar..."
         />
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
