@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import Invetory from "./pages/Invetory";
+import Clients from "./pages/Clients";
 
 function Layout() {
   return (
@@ -38,6 +39,7 @@ function App() {
           >
             <Route index element={<Home />} />
             <Route path="/inventario" element={<Invetory />} />
+            <Route path="/clientes" element={<Clients />} />
           </Route>
         </Routes>
       </Router>
