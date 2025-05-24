@@ -2,6 +2,7 @@ import { ChangeEvent, useState } from "react";
 import { Part } from "../../types/invetory";
 import Product from "./Product";
 import SaleCart from "./SaleCart";
+import Close from "../../icons/Close";
 
 const MakeSaleModal = ({
   parts,
@@ -35,12 +36,12 @@ const MakeSaleModal = ({
             </button>
           </div>
           <button
-            className="text-gray-400 hover:text-white p-4 font-bold text-xl"
+            className="text-gray-400 hover:text-white m-4 font-bold"
             onClick={() => {
               setIsModalOpen(false);
             }}
           >
-            ✕
+            <Close />
           </button>
         </div>
         <div className="flex flex-col md:flex-row">
