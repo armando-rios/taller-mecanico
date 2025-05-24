@@ -18,7 +18,9 @@ const Navbar = () => {
 
   return (
     <header className="h-1/14 flex items-center justify-between px-4">
-      <h1 className="text-2xl font-bold text-orange-700">Taller Mecanico</h1>
+      <a href="/">
+        <h1 className="text-2xl font-bold text-orange-700">Taller Mecanico</h1>
+      </a>
       <nav className="flex gap-4 items-center">
         {navigation.map((item) => (
           <Link
