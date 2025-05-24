@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import api from "../config/axios";
 import Modal from "../components/inventory/Modal";
 import { Part, Category } from "../types/invetory";
-import Search from "../components/inventory/Search";
+import Search from "../components/Search";
 
 const Invetory = () => {
   const [parts, setParts] = useState<Part[]>([]);
@@ -53,7 +53,15 @@ const Invetory = () => {
         {isModalOpen && (
           <Modal setIsModalOpen={setIsModalOpen} fetchParts={fetchParts} />
         )}
-        <Search parts={parts} setFilteredParts={setFilteredParts} />
+        <Search
+          data={parts}
+          setFilteredData={setFilteredParts}
+          searchFn={(item, searchTerm) =>
+            item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.code.toLowerCase().includes(searchTerm.toLowerCase())
+          }
+          placeholder="Buscar..."
+        />
         <div className="flex-1 overflow-hidden flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto rounded-lg">
             <table className="w-full bg-neutral-700 rounded-lg overflow-hidden">
