@@ -5,8 +5,8 @@ import api from "../config/axios";
 
 const searchClient = (client: Client, searchTerm: string) => {
   return (
-    client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.ci.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.phone.toLowerCase().includes(searchTerm.toLowerCase())
   );
 };
@@ -41,7 +41,42 @@ const Clients = () => {
         searchFn={searchClient}
       />
       <div className="flex-1 overflow-hidden flex flex-col min-h-0">
-        <div className="flex-1 overflow-y-auto rounded-lg"></div>
+        <div className="flex-1 overflow-y-auto rounded-lg">
+          <table className="w-full bg-neutral-700 rounded-lg overflow-hidden">
+            <thead className="bg-neutral-600 sticky top-0">
+              <tr>
+                <th className="p-3 text-left">CI</th>
+                <th className="p-3 text-left">Nombres</th>
+                <th className="p-3 text-left">Apellidos</th>
+                <th className="p-3 text-left">Email</th>
+                <th className="p-3 text-left">Teléfono</th>
+                <th className="p-3 text-left">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredClients.map((client: Client) => {
+                return (
+                  <tr
+                    className="border-t border-gray-700 hover:bg-gray-700"
+                    key={client._id}
+                  >
+                    <td className="p-3 w-1/6">{client.ci}</td>
+                    <td className="p-3">{client.firstName}</td>
+                    <td className="p-3">{client.lastName}</td>
+                    <td className="p-3 flex space-x-2">
+                      <button className="text-orange-700 hover:underline">
+                        Editar
+                      </button>
+                      <button className="text-red-500 hover:underline">
+                        Eliminar
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
