@@ -1,6 +1,9 @@
+// workshop client interface
 export interface Client {
-  id: number;
-  name: string;
+  _id: number;
+  firstName: string;
+  lastName: string;
+  ci: string;
   email: string;
   phone: string;
 }
