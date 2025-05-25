@@ -5,6 +5,7 @@ import connectDB from './config/db';
 import authRoutes from './routes/auth.routes';
 import partsRoutes from './routes/parts.routes';
 import categoryRoutes from './routes/category.routes';
+import clientRoutes from './routes/clients.routes';
 
 dotenv.config();
 const port = process.env.PORT;
@@ -19,6 +20,7 @@ connectDB();
 app.use('/api/auth', authRoutes);
 app.use('/api', partsRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/', clientRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
