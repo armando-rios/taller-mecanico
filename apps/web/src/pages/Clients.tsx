@@ -6,6 +6,7 @@ import api from "../config/axios";
 const searchClient = (client: Client, searchTerm: string) => {
   return (
     client.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    client.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.ci.toLowerCase().includes(searchTerm.toLowerCase()) ||
     client.phone.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -63,6 +64,8 @@ const Clients = () => {
                     <td className="p-3 w-1/6">{client.ci}</td>
                     <td className="p-3">{client.firstName}</td>
                     <td className="p-3">{client.lastName}</td>
+                    <td className="p-3">{client.email}</td>
+                    <td className="p-3">{client.phone}</td>
                     <td className="p-3 flex space-x-2">
                       <button className="text-orange-700 hover:underline">
                         Editar
