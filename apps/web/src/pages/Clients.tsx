@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Search from "../components/Search";
 import { Client } from "../types/client";
+import api from "../config/axios";
 
 const searchClient = (client: Client, searchTerm: string) => {
   return (
@@ -13,6 +14,21 @@ const searchClient = (client: Client, searchTerm: string) => {
 const Clients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+
+  const fetchClients = async () => {
+    try {
+      const { data } = await api.get("/clients");
+      setClients(data);
+      setFilteredClients(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchClients();
+    setFilteredClients(clients);
+  }, []);
 
   return (
     <div className="p-3 bg-neutral-800 rounded-lg gap-4 flex flex-col flex-1 h-full">
