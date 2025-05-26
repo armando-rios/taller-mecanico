@@ -30,13 +30,21 @@ const MakeSaleModal = ({
         <div className="flex justify-between border-b border-neutral-700">
           <div className="flex">
             <button
-              className="px-4 py-4 text-orange-700 border-b-2 border-orange-700"
+              className={`px-4 py-4 border-b-2 ${
+                saleForm
+                  ? "text-orange-700 border-orange-700"
+                  : "text-neutral-400 hover:text-white border-transparent"
+              }`}
               onClick={changeToSale}
             >
               Nueva Venta
             </button>
             <button
-              className="px-4 py-4 text-neutral-400 hover:text-white"
+              className={`px-4 py-4 border-b-2 ${
+                clientForm
+                  ? "text-orange-700 border-orange-700"
+                  : "text-neutral-400 hover:text-white border-transparent"
+              }`}
               onClick={changeToClient}
             >
               Cliente
