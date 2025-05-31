@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Part } from "../../types/invetory";
+import { Part } from "../../../types/invetory";
 
 interface SaleProductProps {
   part: Part;

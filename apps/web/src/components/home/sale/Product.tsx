@@ -1,4 +1,4 @@
-import { Part } from "../../types/invetory";
+import { Part } from "../../../types/invetory";
 
 interface ProductProps {
   data: Part;

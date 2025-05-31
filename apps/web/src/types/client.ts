@@ -1,4 +1,3 @@
-// workshop client interface
 export interface Client {
   _id: number;
   firstName: string;

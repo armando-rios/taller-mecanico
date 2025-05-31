@@ -1,4 +1,4 @@
-import { Part } from "../../types/invetory";
+import { Part } from "../../../types/invetory";
 import SaleProduct from "./SaleProduct";
 
 interface SaleCartProps {
@@ -7,8 +7,11 @@ interface SaleCartProps {
 }
 
 const SaleCart = ({ parts, setPartsList }: SaleCartProps) => {
+  const minRows = 2;
+  const emptyRowsNeeded = Math.max(0, minRows - parts.length);
+
   return (
-    <div className="bg-neutral-700 rounded-lg overflow-hidden">
+    <div className="bg-neutral-700 rounded-lg">
       <table className="w-full text-sm">
         <thead className="bg-neutral-600">
           <tr>
@@ -19,16 +22,34 @@ const SaleCart = ({ parts, setPartsList }: SaleCartProps) => {
             <th className="p-2"></th>
           </tr>
         </thead>
-        <tbody>
-          {parts.map((part) => (
-            <SaleProduct
-              key={part._id}
-              part={part}
-              setPartsList={setPartsList}
-            />
-          ))}
-        </tbody>
       </table>
+      {/* Scrollable tbody */}
+      <div className="max-h-[89px] overflow-y-auto">
+        <table className="w-full text-sm">
+          <tbody>
+            {parts.map((part) => (
+              <SaleProduct
+                key={part._id}
+                part={part}
+                setPartsList={setPartsList}
+              />
+            ))}
+            {[...Array(emptyRowsNeeded)].map((_, index) => (
+              <tr
+                key={`empty-${index}`}
+                className="border-b border-neutral-600"
+              >
+                <td
+                  colSpan={5}
+                  className="p-3 text-center text-neutral-400 italic"
+                >
+                  Vacío
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
