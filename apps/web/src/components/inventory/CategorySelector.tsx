@@ -1,4 +1,4 @@
-import { Category } from "../../types/invetory";
+import { Category } from "../../types/inventory";
 
 interface CategorySelectorProps {
   categories: Category[];

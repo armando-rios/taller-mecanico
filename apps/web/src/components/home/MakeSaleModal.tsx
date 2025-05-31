@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Part } from "../../types/invetory";
+import { Part } from "../../types/inventory";
 import api from "../../config/axios";
 import Close from "../../icons/Close";
 import CreateClient from "./sale/CreateClient";
