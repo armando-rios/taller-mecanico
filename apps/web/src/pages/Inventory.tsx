@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import api from "../config/axios";
 import Modal from "../components/inventory/Modal";
-import { Part, Category } from "../types/invetory";
+import { Part, Category } from "../types/inventory";
 import Search from "../components/Search";
+import DeleteButton from "../components/inventory/DeleteButton";
 
 const Invetory = () => {
   const [parts, setParts] = useState<Part[]>([]);
@@ -17,6 +18,11 @@ const Invetory = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setParts((prev) => prev.filter((part) => part._id !== id));
+    setFilteredParts((prev) => prev.filter((part) => part._id !== id));
   };
 
   const fetchParts = async () => {
@@ -99,9 +105,12 @@ const Invetory = () => {
                         <button className="text-orange-700 hover:underline">
                           Editar
                         </button>
-                        <button className="text-red-500 hover:underline">
-                          Eliminar
-                        </button>
+                        <DeleteButton id={part._id} onDelete={handleDelete} />
+                        {
+                          // <button className="text-red-500 hover:underline">
+                          //   Eliminar
+                          // </button>
+                        }
                       </td>
                     </tr>
                   );

@@ -4,7 +4,7 @@ import Close from "../../icons/Close";
 import api from "../../config/axios";
 import CategorySelector from "./CategorySelector";
 import CreateCategoryModal from "./CreateCategoryModal";
-import { Category } from "../../types/invetory";
+import { Category } from "../../types/inventory";
 
 interface ModalProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;

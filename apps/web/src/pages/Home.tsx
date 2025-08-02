@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import MakeSaleModal from "../components/home/MakeSaleModal";
 import api from "../config/axios";
-import { Part } from "../types/invetory";
+import { Part } from "../types/inventory";
 
 const Home = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);

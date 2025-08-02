@@ -9,7 +9,7 @@ import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
-import Invetory from "./pages/Invetory";
+import Inventory from "./pages/Inventory";
 import Clients from "./pages/Clients";
 
 function Layout() {
@@ -38,7 +38,7 @@ function App() {
             }
           >
             <Route index element={<Home />} />
-            <Route path="/inventario" element={<Invetory />} />
+            <Route path="/inventario" element={<Inventory />} />
             <Route path="/clientes" element={<Clients />} />
           </Route>
         </Routes>
