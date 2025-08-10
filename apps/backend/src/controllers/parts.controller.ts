@@ -35,6 +35,25 @@ export const createPart = async (req: RequestWithUser, res: Response) => {
   }
 };
 
+export const updatePart = async (req: RequestWithUser, res: Response) => {
+  try {
+    const { id } = req.params;
+    const user = req.user;
+    if (user?.rol !== 'admin') {
+      return res
+        .status(403)
+        .json({ message: 'Forbidden: You do not have permission to update parts.' });
+    }
+    const part = await Part.findByIdAndUpdate(id, req.body, { new: true });
+    if (!part) {
+      throw new Error('Part not found');
+    }
+    return res.status(200).json(part);
+  } catch (error) {
+    return res.status(500).json({ message: (error as Error).message });
+  }
+};
+
 export const deletePart = async (req: RequestWithUser, res: Response) => {
   try {
     const { id } = req.params;
