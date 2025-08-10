@@ -4,7 +4,7 @@ export interface Part {
   code: string;
   description: string;
   brand: string;
-  model: string;
+  itemModel: string;
   price: number;
   category: string;
   stock: number;

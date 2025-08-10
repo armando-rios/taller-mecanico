@@ -4,9 +4,11 @@ import Modal from "../components/inventory/Modal";
 import { Part, Category } from "../types/inventory";
 import Search from "../components/Search";
 import DeleteButton from "../components/inventory/DeleteButton";
+import UpdateButton from "../components/inventory/UpdateButton";
 
 const Invetory = () => {
   const [parts, setParts] = useState<Part[]>([]);
+  const [editingPart, setEditingPart] = useState<Part | null>(null);
   const [filteredParts, setFilteredParts] = useState<Part[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -18,6 +20,24 @@ const Invetory = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingPart(null); // Resetea el modo edición
+  };
+
+  const handleEdit = (part: Part) => {
+    setEditingPart(part);
+  };
+
+  const handleUpdate = (updatedPart: Part) => {
+    setParts((prev) =>
+      prev.map((part) => (part._id === updatedPart._id ? updatedPart : part)),
+    );
+    setFilteredParts((prev) =>
+      prev.map((part) => (part._id === updatedPart._id ? updatedPart : part)),
+    );
   };
 
   const handleDelete = (id: string) => {
@@ -60,8 +80,13 @@ const Invetory = () => {
             Registrar Producto
           </button>
         </div>
-        {isModalOpen && (
-          <Modal setIsModalOpen={setIsModalOpen} fetchParts={fetchParts} />
+        {(isModalOpen || editingPart) && (
+          <Modal
+            setIsModalOpen={closeModal}
+            fetchParts={fetchParts}
+            editPart={editingPart}
+            onUpdate={handleUpdate} // NUEVO
+          />
         )}
         <Search
           data={parts}
@@ -102,15 +127,8 @@ const Invetory = () => {
                       <td className="p-3">{part.stock}</td>
                       <td className="p-3">{part.price}</td>
                       <td className="p-3 flex space-x-2">
-                        <button className="text-orange-700 hover:underline">
-                          Editar
-                        </button>
+                        <UpdateButton part={part} onEdit={handleEdit} />
                         <DeleteButton id={part._id} onDelete={handleDelete} />
-                        {
-                          // <button className="text-red-500 hover:underline">
-                          //   Eliminar
-                          // </button>
-                        }
                       </td>
                     </tr>
                   );

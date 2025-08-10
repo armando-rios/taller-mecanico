@@ -4,23 +4,33 @@ import Close from "../../icons/Close";
 import api from "../../config/axios";
 import CategorySelector from "./CategorySelector";
 import CreateCategoryModal from "./CreateCategoryModal";
-import { Category } from "../../types/inventory";
+import { Category, Part } from "../../types/inventory";
 
 interface ModalProps {
   setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   fetchParts: () => void;
+  editPart?: Part | null;
+  onUpdate?: (updatedPart: Part) => void; // NUEVO
 }
 
-const Modal = ({ setIsModalOpen, fetchParts }: ModalProps) => {
-  const [name, setName] = useState("");
-  const [code, setCode] = useState("");
-  const [category, setCategory] = useState("");
-  const [brand, setBrand] = useState("");
-  const [itemModel, setItemModel] = useState("");
-  const [price, setPrice] = useState("");
-  const [stock, setStock] = useState("");
-  const [provider, setProvider] = useState("");
-  const [description, setDescription] = useState("");
+const Modal = ({
+  setIsModalOpen,
+  fetchParts,
+  editPart,
+  onUpdate,
+}: ModalProps) => {
+  const isEditMode = !!editPart;
+
+  // Inicializar con datos existentes si estamos editando
+  const [name, setName] = useState(editPart?.name || "");
+  const [code, setCode] = useState(editPart?.code || "");
+  const [category, setCategory] = useState(editPart?.category || "");
+  const [brand, setBrand] = useState(editPart?.brand || "");
+  const [itemModel, setItemModel] = useState(editPart?.itemModel || "");
+  const [price, setPrice] = useState(editPart?.price?.toString() || "");
+  const [stock, setStock] = useState(editPart?.stock?.toString() || "");
+  const [provider, setProvider] = useState(editPart?.provider || "");
+  const [description, setDescription] = useState(editPart?.description || "");
   const [categories, setCategories] = useState<Category[]>([]);
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
@@ -37,8 +47,8 @@ const Modal = ({ setIsModalOpen, fetchParts }: ModalProps) => {
     fetchCategories();
   }, []);
 
-  const handleSubmit = () => {
-    api.post("/parts", {
+  const handleSubmit = async () => {
+    const partData = {
       name,
       code,
       description,
@@ -48,8 +58,17 @@ const Modal = ({ setIsModalOpen, fetchParts }: ModalProps) => {
       category,
       stock,
       provider,
-    });
-    fetchParts();
+    };
+
+    if (isEditMode) {
+      const response = await api.put(`/parts/${editPart._id}`, partData);
+      if (onUpdate && response.data) {
+        onUpdate(response.data); // Actualización optimista
+      }
+    } else {
+      await api.post("/parts", partData);
+      fetchParts(); // Solo refetch al crear
+    }
     setIsModalOpen(false);
   };
 
@@ -63,9 +82,7 @@ const Modal = ({ setIsModalOpen, fetchParts }: ModalProps) => {
     <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-10">
       <div className="bg-neutral-800 rounded-lg shadow-xl w-full max-w-2xl">
         <div className="flex justify-between items-center border-b border-neutral-700 p-4">
-          <h3 className="text-xl font-semibold text-orange-700">
-            Agregar Nuevo Producto
-          </h3>
+          <h3>{isEditMode ? "Editar Producto" : "Agregar Nuevo Producto"}</h3>
           <button
             className="text-gray-400 hover:text-white"
             onClick={() => setIsModalOpen(false)}
