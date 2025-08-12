@@ -92,15 +92,13 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const getUsers = async (req: RequestWithUser, res: Response) => {
+export const getUsers = async (_req: RequestWithUser, res: Response) => {
   try {
     const users = await User.find();
 
     if (!users) {
       throw new Error('Users not found');
     }
-
-    console.log(req.user);
 
     return res.status(200).json(users);
   } catch (error) {

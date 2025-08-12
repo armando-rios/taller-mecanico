@@ -6,9 +6,8 @@ interface RequestWithUser extends Request {
   user?: IUser;
 }
 
-export const getParts = async (req: RequestWithUser, res: Response) => {
+export const getParts = async (_req: RequestWithUser, res: Response) => {
   try {
-    console.log(req.user);
     const parts = await Part.find();
 
     if (!parts) {

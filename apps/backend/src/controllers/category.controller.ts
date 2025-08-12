@@ -20,15 +20,13 @@ export const createCategory = async (req: Request, res: Response) => {
   }
 };
 
-export const getCategories = async (req: RequestWithUser, res: Response) => {
+export const getCategories = async (_req: RequestWithUser, res: Response) => {
   try {
     const categories = await Category.find();
 
     if (!categories) {
       throw new Error('Categories not found');
     }
-
-    console.log({ userData: req.user, categorias: categories });
 
     res.status(200).json(categories);
   } catch (error) {

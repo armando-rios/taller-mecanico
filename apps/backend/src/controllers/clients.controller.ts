@@ -6,15 +6,13 @@ interface RequestWithUser extends Request {
   user?: IUser;
 }
 
-export const getClients = async (req: RequestWithUser, res: Response) => {
+export const getClients = async (_req: RequestWithUser, res: Response) => {
   try {
     const clients = await Client.find();
 
     if (!clients) {
       throw new Error('Clients not found');
     }
-
-    console.log(req.user);
 
     res.status(200).json(clients);
   } catch (error) {
