@@ -22,7 +22,9 @@ export const getClients = async (_req: RequestWithUser, res: Response) => {
 
 export const createClient = async (req: Request, res: Response) => {
   try {
-    const client = await Client.create(req.body);
+    const data = req.body;
+
+    const client = await Client.create(data);
 
     if (!client) {
       throw new Error('Client not created');

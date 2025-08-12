@@ -4,6 +4,7 @@ export interface IClient extends Document {
   firstName: string;
   lastName: string;
   ci: string;
-  email: string;
+  email?: string;
   phone: string;
+  otherContact?: string;
 }

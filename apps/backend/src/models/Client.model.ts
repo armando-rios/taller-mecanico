@@ -23,6 +23,10 @@ const clientSchema = new Schema<IClient>(
       type: String,
       required: [true, 'Por favor ingrese un telefono'],
     },
+    otherContact: {
+      type: String,
+      required: [false, 'Por favor ingrese un otro contacto'],
+    },
   },
   {
     timestamps: true,
