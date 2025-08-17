@@ -1,7 +1,6 @@
 import Client from '../models/Client.model';
 import { Request, Response } from 'express';
 import { IUser } from '../interfaces/user.interface';
-import { isValidObjectId } from 'mongoose';
 
 interface RequestWithUser extends Request {
   user?: IUser;
@@ -37,14 +36,25 @@ export const createClient = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteClient = async (req: Request, res: Response) => {
+export const getClientById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
 
-    if (!isValidObjectId(id)) {
-      res.status(400).json({ message: 'Invalid client ID format' });
+    const client = await Client.findById(id);
+    if (!client) {
+      res.status(404).json({ message: 'Client not found' });
       return;
     }
+
+    res.status(200).json(client);
+  } catch (error) {
+    res.status(500).json({ message: (error as Error).message });
+  }
+};
+
+export const deleteClient = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
 
     const client = await Client.findByIdAndDelete(id);
     if (!client) {
