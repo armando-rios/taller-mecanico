@@ -3,8 +3,8 @@ import api from "../config/axios";
 import Modal from "../components/inventory/Modal";
 import { Part, Category } from "../types/inventory";
 import Search from "../components/Search";
-import DeleteButton from "../components/inventory/DeleteButton";
 import UpdateButton from "../components/inventory/UpdateButton";
+import DeleteButton from "../components/shared/DeleteButton";
 
 const Invetory = () => {
   const [parts, setParts] = useState<Part[]>([]);
@@ -128,7 +128,11 @@ const Invetory = () => {
                       <td className="p-3">{part.price}</td>
                       <td className="p-3 flex space-x-2">
                         <UpdateButton part={part} onEdit={handleEdit} />
-                        <DeleteButton id={part._id} onDelete={handleDelete} />
+                        <DeleteButton
+                          id={part._id}
+                          endpoint={"parts"}
+                          onDelete={handleDelete}
+                        />
                       </td>
                     </tr>
                   );

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import Search from "../components/Search";
 import { Client } from "../types/client";
 import api from "../config/axios";
+import DeleteButton from "../components/shared/DeleteButton";
 
 const searchClient = (client: Client, searchTerm: string) => {
   return (
@@ -15,6 +16,12 @@ const searchClient = (client: Client, searchTerm: string) => {
 const Clients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+
+  const handleDelete = (id: string) => {
+    const updatedClients = clients.filter((client) => client._id !== id);
+    setClients(updatedClients);
+    setFilteredClients(updatedClients);
+  };
 
   const fetchClients = async () => {
     try {
@@ -70,9 +77,11 @@ const Clients = () => {
                       <button className="text-orange-700 hover:underline">
                         Editar
                       </button>
-                      <button className="text-red-500 hover:underline">
-                        Eliminar
-                      </button>
+                      <DeleteButton
+                        id={client._id}
+                        endpoint={"clients"}
+                        onDelete={handleDelete}
+                      />
                     </td>
                   </tr>
                 );
