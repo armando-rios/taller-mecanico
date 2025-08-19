@@ -1,6 +1,45 @@
-const SaleSummary = () => {
+import { Client } from "../../../types/client";
+
+interface SaleSummaryProps {
+  selectedClient: Client | null;
+  onRemoveClient: () => void;
+}
+
+const SaleSummary = ({ selectedClient, onRemoveClient }: SaleSummaryProps) => {
   return (
     <div className="p-4 md:w-1/3">
+      {/* NUEVA SECCIÓN: Cliente Seleccionado */}
+      <div className="bg-neutral-700 p-4 rounded-lg mb-4">
+        {selectedClient ? (
+          <div className="flex justify-between items-center">
+            <div className="flex flex-col gap-1">
+              <p className="font-medium text-orange-700">
+                {selectedClient.firstName} {selectedClient.lastName}
+              </p>
+              <p className="text-sm text-neutral-400">
+                CI: {selectedClient.ci}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={onRemoveClient}
+              className="bg-orange-700 w-8 h-8 rounded-lg text-white hover:bg-orange-600 text-sm"
+              title="Remover cliente"
+            >
+              ✕
+            </button>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-1">
+            <h4 className="font-medium text-orange-700">Cliente</h4>
+            <p className="text-neutral-400 text-sm italic">
+              No hay cliente seleccionado
+            </p>
+          </div>
+        )}
+      </div>
+
+      {/* MANTENER TODO EL CÓDIGO ORIGINAL EXISTENTE */}
       <div className="bg-neutral-700 p-4 rounded-lg mb-4">
         <h4 className="font-medium text-orange-700 mb-3">Resumen de Venta</h4>
 
@@ -39,7 +78,11 @@ const SaleSummary = () => {
         </div>
       </div>
 
-      <button className="w-full bg-orange-700 py-3 rounded-lg font-medium hover:bg-orange-800 transition">
+      {/* SOLO AGREGAR disabled AL BOTÓN EXISTENTE */}
+      <button
+        className="w-full bg-orange-700 py-3 rounded-lg font-medium hover:bg-orange-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={!selectedClient}
+      >
         Finalizar Venta
       </button>
     </div>

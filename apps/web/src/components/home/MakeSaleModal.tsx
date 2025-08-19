@@ -19,6 +19,7 @@ const MakeSaleModal = ({
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
 
   // Custom hook-like para obtener clientes
   const fetchClients = useCallback(async () => {
@@ -109,10 +110,16 @@ const MakeSaleModal = ({
             <CreateClient
               clients={clients}
               onClientCreated={handleClientCreated}
+              selectedClient={selectedClient}
+              onSelectClient={setSelectedClient}
+              setActiveTab={setActiveTab}
             />
           )}
           {activeTab === "sale" && <CreateSale parts={parts} />}
-          <SaleSummary />
+          <SaleSummary
+            selectedClient={selectedClient}
+            onRemoveClient={() => setSelectedClient(null)}
+          />
         </div>
       </div>
     </div>

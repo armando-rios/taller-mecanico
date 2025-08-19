@@ -7,9 +7,18 @@ import api from "../../../config/axios";
 interface Props {
   clients: Client[];
   onClientCreated: (client: Client) => void;
+  selectedClient: Client | null;
+  onSelectClient: (client: Client) => void;
+  setActiveTab: React.Dispatch<React.SetStateAction<"sale" | "client">>;
 }
 
-const CreateClient = ({ clients, onClientCreated }: Props) => {
+const CreateClient = ({
+  clients,
+  onClientCreated,
+  selectedClient,
+  onSelectClient,
+  setActiveTab,
+}: Props) => {
   const [ci, setCi] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -39,6 +48,11 @@ const CreateClient = ({ clients, onClientCreated }: Props) => {
     setOtherContact("");
   };
 
+  const handleSelectClient = (client: Client) => {
+    onSelectClient(client);
+    setActiveTab("sale");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -62,6 +76,7 @@ const CreateClient = ({ clients, onClientCreated }: Props) => {
       });
 
       onClientCreated(data);
+      onSelectClient(data);
       setFilteredClients((prev) => [...prev, data]);
       resetForm();
       setSuccess(true);
@@ -90,13 +105,27 @@ const CreateClient = ({ clients, onClientCreated }: Props) => {
         {filteredClients.map((client) => (
           <div
             key={client.ci}
-            className="flex justify-between items-center px-4 py-2 bg-neutral-700 rounded-lg text-sm font-medium"
+            className={`flex justify-between items-center px-4 py-2 rounded-lg text-sm font-medium ${
+              selectedClient?._id === client._id
+                ? "bg-orange-700"
+                : "bg-neutral-700"
+            }`}
           >
             <div>
               <h3>{client.firstName + " " + client.lastName}</h3>
               <p>CI: {client.ci}</p>
             </div>
-            <button className="bg-orange-700 w-8 h-8 rounded-lg">+</button>
+            <button
+              type="button"
+              onClick={() => handleSelectClient(client)}
+              className={`w-8 h-8 rounded-lg transition ${
+                selectedClient?._id === client._id
+                  ? "bg-orange-900 text-white"
+                  : "bg-orange-700 hover:bg-orange-600"
+              }`}
+            >
+              {selectedClient?._id === client._id ? "✓" : "+"}
+            </button>
           </div>
         ))}
       </div>
