@@ -28,11 +28,17 @@ const MakeSaleModal = ({
       const { data } = await api.get("/clients");
       setClients(data);
     } catch (error) {
-      setError("Error al cargar clientes");
+      if (error) {
+        setError("Error al cargar clientes");
+      }
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const handleClientCreated = (newClient: Client) => {
+    setClients((prevClients) => [...prevClients, newClient]);
+  };
 
   useEffect(() => {
     fetchClients();
@@ -99,7 +105,12 @@ const MakeSaleModal = ({
         {error && <div className="p-4 text-red-500">{error}</div>}
 
         <div className="flex md:flex-row items-center">
-          {activeTab === "client" && <CreateClient clients={clients} />}
+          {activeTab === "client" && (
+            <CreateClient
+              clients={clients}
+              onClientCreated={handleClientCreated}
+            />
+          )}
           {activeTab === "sale" && <CreateSale parts={parts} />}
           <SaleSummary />
         </div>
