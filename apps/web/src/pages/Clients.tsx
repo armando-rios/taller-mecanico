@@ -3,6 +3,7 @@ import Search from "../components/Search";
 import { Client } from "../types/client";
 import api from "../config/axios";
 import DeleteButton from "../components/shared/DeleteButton";
+import ClientDetailsModal from "../components/clients/ClientDetailsModal";
 
 const searchClient = (client: Client, searchTerm: string) => {
   return (
@@ -16,11 +17,18 @@ const searchClient = (client: Client, searchTerm: string) => {
 const Clients = () => {
   const [clients, setClients] = useState<Client[]>([]);
   const [filteredClients, setFilteredClients] = useState<Client[]>([]);
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
   const handleDelete = (id: string) => {
     const updatedClients = clients.filter((client) => client._id !== id);
     setClients(updatedClients);
     setFilteredClients(updatedClients);
+  };
+
+  const handleViewDetails = (client: Client) => {
+    setSelectedClient(client);
+    setIsDetailsModalOpen(true);
   };
 
   const fetchClients = async () => {
@@ -57,7 +65,7 @@ const Clients = () => {
                 <th className="p-3 text-left">Nombres</th>
                 <th className="p-3 text-left">Apellidos</th>
                 <th className="p-3 text-left">Email</th>
-                <th className="p-3 text-left">Teléfono</th>
+                <th className="p-3 text-left">Teléfono</th>
                 <th className="p-3 text-left">Acciones</th>
               </tr>
             </thead>
@@ -74,6 +82,12 @@ const Clients = () => {
                     <td className="p-3">{client.email}</td>
                     <td className="p-3">{client.phone}</td>
                     <td className="p-3 flex space-x-2">
+                      <button
+                        className="text-blue-500 hover:underline"
+                        onClick={() => handleViewDetails(client)}
+                      >
+                        Ver Detalles
+                      </button>
                       <button className="text-orange-700 hover:underline">
                         Editar
                       </button>
@@ -90,6 +104,14 @@ const Clients = () => {
           </table>
         </div>
       </div>
+
+      {/* Client Details Modal */}
+      {isDetailsModalOpen && selectedClient && (
+        <ClientDetailsModal
+          client={selectedClient}
+          setIsModalOpen={setIsDetailsModalOpen}
+        />
+      )}
     </div>
   );
 };
