@@ -1,4 +1,4 @@
-import mongoose, { Schema, model } from 'mongoose';
+import { Schema, model } from 'mongoose';
 import { IPart } from '../interfaces/part.interface';
 
 const partSchema = new Schema<IPart>(
@@ -28,7 +28,7 @@ const partSchema = new Schema<IPart>(
       required: [true, 'Por favor ingrese un stock'],
     },
     category: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       required: [true, 'Por favor ingrese una categoria'],
     },
     provider: {

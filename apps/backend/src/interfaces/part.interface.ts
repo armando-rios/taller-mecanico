@@ -1,6 +1,7 @@
 import { Document, ObjectId } from 'mongoose';
 
 export interface IPart extends Document {
+  _id: ObjectId;
   code: string;
   name: string;
   description: string;
