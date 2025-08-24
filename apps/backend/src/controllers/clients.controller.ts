@@ -52,9 +52,14 @@ export const getClientById = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteClient = async (req: Request, res: Response) => {
+export const deleteClient = async (req: RequestWithUser, res: Response) => {
   try {
     const { id } = req.params;
+    const user = req.user;
+    if (user?.rol !== 'admin') {
+      res.status(403).json({ message: 'Forbidden: You do not have permission to delete clients' });
+      return;
+    }
 
     const client = await Client.findByIdAndDelete(id);
     if (!client) {
