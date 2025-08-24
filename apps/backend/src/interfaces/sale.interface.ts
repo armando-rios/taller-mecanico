@@ -1,10 +1,10 @@
-import { ObjectId } from 'mongoose';
+import { Document, ObjectId } from 'mongoose';
 
 export interface ISaleItem {
   part: ObjectId;
   quantity: number;
-  unitPrice: number;
-  subtotal: number;
+  unitPrice?: number;
+  subtotal?: number;
 }
 
 export interface ISale extends Document {
@@ -15,7 +15,7 @@ export interface ISale extends Document {
   tax: number;
   discount: number;
   total: number;
-  paymentMethod: 'cash' | 'credit_card' | 'debit_card' | 'other';
+  paymentMethod: 'cash' | 'credit_card' | 'bank_transfer' | 'other';
   status: 'pending' | 'completed' | 'canceled';
   notes?: string;
   createdAt: Date;

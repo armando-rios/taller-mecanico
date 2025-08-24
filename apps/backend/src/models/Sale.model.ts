@@ -1,5 +1,5 @@
 import { model, Schema } from 'mongoose';
-import { ISale } from '../interfaces/sale.interfaec';
+import { ISale } from '../interfaces/sale.interface';
 
 const saleSchema = new Schema<ISale>(
   {
@@ -52,7 +52,7 @@ const saleSchema = new Schema<ISale>(
     },
     paymentMethod: {
       type: String,
-      enum: ['cash', 'credit_card', 'debit_card', 'other'],
+      enum: ['cash', 'credit_card', 'bank_transfer', 'other'],
       required: [true, 'Por favor ingrese un metodo de pago'],
     },
     status: {
