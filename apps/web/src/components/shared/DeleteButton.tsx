@@ -1,37 +1,19 @@
-import { useState } from "react";
-import api from "../../config/axios";
 import Close from "../../icons/Close";
+import useDeleteItem from "../../hooks/useDeleteItem";
 
-const DeleteButton = ({
-  id,
-  endpoint,
-  onDelete,
-}: {
+interface DeleteButtonProps {
   id: string;
   endpoint: string;
   onDelete: (id: string) => void;
-}) => {
-  const [showConfirmModal, setShowConfirmModal] = useState(false);
+}
 
-  const handleDelete = async () => {
-    try {
-      const response = await api.delete(`${endpoint}/${id}`);
-      if (response) {
-        console.log(response.data.message);
-        onDelete(id);
-        setShowConfirmModal(false);
-      }
-    } catch (error) {
-      console.error(error);
-      setShowConfirmModal(false);
-    }
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) {
-      setShowConfirmModal(false);
-    }
-  };
+const DeleteButton = ({ id, endpoint, onDelete }: DeleteButtonProps) => {
+  const {
+    setShowConfirmModal,
+    handleDelete,
+    showConfirmModal,
+    handleBackdropClick,
+  } = useDeleteItem({ endpoint, id, onDelete });
 
   return (
     <>

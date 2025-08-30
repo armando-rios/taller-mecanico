@@ -1,50 +1,21 @@
-import { useState, useEffect } from "react";
 import Search from "../components/Search";
 import { Client } from "../types/client";
-import api from "../config/axios";
 import DeleteButton from "../components/shared/DeleteButton";
 import ClientDetailsModal from "../components/clients/ClientDetailsModal";
-
-const searchClient = (client: Client, searchTerm: string) => {
-  return (
-    client.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.ci.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    client.phone.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-};
+import useClients from "../hooks/clients/useClients";
 
 const Clients = () => {
-  const [clients, setClients] = useState<Client[]>([]);
-  const [filteredClients, setFilteredClients] = useState<Client[]>([]);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-
-  const handleDelete = (id: string) => {
-    const updatedClients = clients.filter((client) => client._id !== id);
-    setClients(updatedClients);
-    setFilteredClients(updatedClients);
-  };
-
-  const handleViewDetails = (client: Client) => {
-    setSelectedClient(client);
-    setIsDetailsModalOpen(true);
-  };
-
-  const fetchClients = async () => {
-    try {
-      const { data } = await api.get("/clients");
-      setClients(data);
-      setFilteredClients(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchClients();
-    setFilteredClients(clients);
-  }, []);
+  const {
+    clients,
+    filteredClients,
+    setFilteredClients,
+    handleDelete,
+    handleViewDetails,
+    selectedClient,
+    isDetailsModalOpen,
+    setIsDetailsModalOpen,
+    searchClient,
+  } = useClients();
 
   return (
     <div className="p-3 bg-neutral-800 rounded-lg gap-4 flex flex-col flex-1 h-full">
