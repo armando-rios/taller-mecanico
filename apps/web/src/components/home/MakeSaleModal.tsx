@@ -6,6 +6,7 @@ import CreateClient from "./sale/CreateClient";
 import CreateSale from "./sale/CreateSale";
 import { Client } from "../../types/client";
 import SaleSummary from "./sale/SaleSummary";
+import { CartItem, PaymentMethod } from "../../types/sale";
 
 const MakeSaleModal = ({
   parts,
@@ -20,6 +21,11 @@ const MakeSaleModal = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [discount, setDiscount] = useState<number>(0);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("cash");
+  const [notes, setNotes] = useState<string>("");
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // Custom hook-like para obtener clientes
   const fetchClients = useCallback(async () => {
@@ -39,6 +45,38 @@ const MakeSaleModal = ({
 
   const handleClientCreated = (newClient: Client) => {
     setClients((prevClients) => [...prevClients, newClient]);
+  };
+
+  const handleFinalizeSale = async () => {
+    if (!selectedClient || cartItems.length === 0) return;
+
+    setIsSaving(true);
+    setError(null);
+
+    try {
+      const response = await api.post("/sales", {
+        clientId: selectedClient._id,
+        items: cartItems.map((item) => ({
+          part: item.part._id,
+          quantity: item.quantity,
+          price: item.part.price,
+        })),
+        discount,
+        paymentMethod,
+        notes: notes.trim() || undefined,
+      });
+      // Manejar respuesta exitosa
+      setCartItems([]);
+      setDiscount(0);
+      setPaymentMethod("cash");
+      setNotes("");
+      setSelectedClient(null);
+      setIsModalOpen(false);
+      alert("Venta realizada con éxito");
+      console.log(response);
+    } catch (error) {
+      console.error("Error al finalizar la venta", error);
+    }
   };
 
   useEffect(() => {
@@ -115,10 +153,25 @@ const MakeSaleModal = ({
               setActiveTab={setActiveTab}
             />
           )}
-          {activeTab === "sale" && <CreateSale parts={parts} />}
+          {activeTab === "sale" && (
+            <CreateSale
+              parts={parts}
+              cartItems={cartItems}
+              setCartItems={setCartItems}
+            />
+          )}
           <SaleSummary
             selectedClient={selectedClient}
             onRemoveClient={() => setSelectedClient(null)}
+            cartItems={cartItems}
+            discount={discount}
+            setDiscount={setDiscount}
+            paymentMethod={paymentMethod}
+            setPaymentMethod={setPaymentMethod}
+            notes={notes}
+            setNotes={setNotes}
+            onFinalizeSale={handleFinalizeSale}
+            isSaving={isSaving}
           />
         </div>
       </div>

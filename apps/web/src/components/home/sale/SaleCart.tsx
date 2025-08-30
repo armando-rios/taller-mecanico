@@ -1,14 +1,14 @@
-import { Part } from "../../../types/inventory";
+import { CartItem } from "../../../types/sale";
 import SaleProduct from "./SaleProduct";
 
 interface SaleCartProps {
-  parts: Part[];
-  setPartsList: React.Dispatch<React.SetStateAction<Part[]>>;
+  cartItems: CartItem[];
+  setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
 
-const SaleCart = ({ parts, setPartsList }: SaleCartProps) => {
+const SaleCart = ({ cartItems, setCartItems }: SaleCartProps) => {
   const minRows = 2;
-  const emptyRowsNeeded = Math.max(0, minRows - parts.length);
+  const emptyRowsNeeded = Math.max(0, minRows - cartItems.length); // ← MODIFICADO
 
   return (
     <div className="bg-neutral-700 rounded-lg">
@@ -23,17 +23,20 @@ const SaleCart = ({ parts, setPartsList }: SaleCartProps) => {
           </tr>
         </thead>
       </table>
-      {/* Scrollable tbody */}
       <div className="max-h-[89px] overflow-y-auto">
         <table className="w-full text-sm">
           <tbody>
-            {parts.map((part) => (
-              <SaleProduct
-                key={part._id}
-                part={part}
-                setPartsList={setPartsList}
-              />
-            ))}
+            {cartItems.map(
+              (
+                item, // ← MODIFICADO
+              ) => (
+                <SaleProduct
+                  key={item.part._id} // ← MODIFICADO
+                  cartItem={item} // ← MODIFICADO
+                  setCartItems={setCartItems} // ← MODIFICADO
+                />
+              ),
+            )}
             {[...Array(emptyRowsNeeded)].map((_, index) => (
               <tr
                 key={`empty-${index}`}

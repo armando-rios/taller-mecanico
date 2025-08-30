@@ -1,41 +1,54 @@
-import { useEffect, useState } from "react";
-import { Part } from "../../../types/inventory";
+import { CartItem } from "../../../types/sale";
 
 interface SaleProductProps {
-  part: Part;
-  setPartsList: React.Dispatch<React.SetStateAction<Part[]>>;
+  cartItem: CartItem;
+  setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
 }
 
-const SaleProduct = ({ part, setPartsList }: SaleProductProps) => {
-  const [cuantity, setCuantity] = useState(1);
-  const [total, setTotal] = useState(0);
+const SaleProduct = ({ cartItem, setCartItems }: SaleProductProps) => {
+  // ========== NUEVA FUNCIÓN PARA ACTUALIZAR CANTIDAD ==========
+  const handleQuantityChange = (newQuantity: number) => {
+    if (newQuantity < 1) return; // No permitir cantidad menor a 1
 
-  const handleRemovePart = (part: Part) => {
-    setPartsList((prevParts) => prevParts.filter((p) => p._id !== part._id));
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item.part._id === cartItem.part._id
+          ? { ...item, quantity: newQuantity }
+          : item,
+      ),
+    );
   };
+  // ===========================================================
 
-  useEffect(() => {
-    setTotal(cuantity * part.price);
-  }, [cuantity, part.price]);
+  // ========== NUEVA FUNCIÓN PARA REMOVER ==========
+  const handleRemovePart = () => {
+    setCartItems((prevItems) =>
+      prevItems.filter((item) => item.part._id !== cartItem.part._id),
+    );
+  };
+  // ===============================================
+
+  const total = cartItem.quantity * cartItem.part.price; // ← MODIFICADO
 
   return (
     <tr className="border-b border-neutral-600">
-      <td className="p-2">{part.name}</td>
+      <td className="p-2">{cartItem.part.name}</td>
       <td className="p-2">
         <input
           type="number"
-          value={cuantity}
+          value={cartItem.quantity} // ← MODIFICADO
           min="1"
+          max={cartItem.part.stock} // ← NUEVO: limitar por stock
           className="w-12 bg-neutral-600 rounded p-1"
-          onChange={(e) => setCuantity(parseInt(e.target.value))}
+          onChange={(e) => handleQuantityChange(parseInt(e.target.value) || 1)} // ← MODIFICADO
         />
       </td>
-      <td className="p-2">${part.price}</td>
-      <td className="p-2">${total}</td>
+      <td className="p-2">${cartItem.part.price.toFixed(2)}</td>
+      <td className="p-2">${total.toFixed(2)}</td>
       <td className="p-2">
         <button
           className="text-red-500 hover:text-red-400"
-          onClick={() => handleRemovePart(part)}
+          onClick={handleRemovePart} // ← MODIFICADO
         >
           ✕
         </button>

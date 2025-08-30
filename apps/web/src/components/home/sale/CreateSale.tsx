@@ -1,12 +1,19 @@
 import { useState } from "react";
-import { Part } from "../../../types/invetory";
+import { Part } from "../../../types/inventory";
+import { CartItem } from "../../../types/sale";
 import Product from "./Product";
 import SaleCart from "./SaleCart";
 import Search from "../../Search";
 
-const CreateSale = ({ parts }: { parts: Part[] }) => {
+interface CreateSaleProps {
+  parts: Part[];
+  cartItems: CartItem[];
+  setCartItems: React.Dispatch<React.SetStateAction<CartItem[]>>;
+}
+
+const CreateSale = ({ parts, cartItems, setCartItems }: CreateSaleProps) => {
   const [filteredParts, setFilteredParts] = useState(parts);
-  const [partsList, setPartsList] = useState<Part[]>([]);
+  // const [partsList, setPartsList] = useState<Part[]>([]);
 
   const searchPart = (part: Part, searchTerm: string) =>
     part.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -25,12 +32,17 @@ const CreateSale = ({ parts }: { parts: Part[] }) => {
       <div className="h-64 overflow-y-auto mb-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           {filteredParts.map((part: Part) => (
-            <Product key={part._id} data={part} setPartsList={setPartsList} />
+            <Product
+              key={part._id}
+              data={part}
+              cartItems={cartItems}
+              setCartItems={setCartItems}
+            />
           ))}
         </div>
       </div>
       <h4 className="font-medium mb-2">Productos en la venta</h4>
-      <SaleCart parts={partsList} setPartsList={setPartsList} />
+      <SaleCart cartItems={cartItems} setCartItems={setCartItems} />
     </div>
   );
 };
