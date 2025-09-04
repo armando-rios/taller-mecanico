@@ -1,26 +1,6 @@
-import { useState, useEffect } from "react";
 import { Client } from "../../types/client";
 import Close from "../../icons/Close";
-import api from "../../config/axios";
-
-interface Purchase {
-  _id: string;
-  date: string;
-  total: number;
-  items: {
-    partName: string;
-    quantity: number;
-    price: number;
-  }[];
-}
-
-interface Service {
-  _id: string;
-  date: string;
-  description: string;
-  status: string;
-  cost: number;
-}
+import useClientDetails from "../../hooks/clients/useClientDetails";
 
 interface ClientDetailsModalProps {
   client: Client;
@@ -31,82 +11,17 @@ const ClientDetailsModal = ({
   client,
   setIsModalOpen,
 }: ClientDetailsModalProps) => {
-  const [activeTab, setActiveTab] = useState<"info" | "purchases" | "services">(
-    "info",
-  );
-  const [purchases, setPurchases] = useState<Purchase[]>([]);
-  const [services, setServices] = useState<Service[]>([]);
-  const [loadingPurchases, setLoadingPurchases] = useState(false);
-  const [loadingServices, setLoadingServices] = useState(false);
-
-  // Fetch purchases when purchases tab is active
-  useEffect(() => {
-    if (activeTab === "purchases" && purchases.length === 0) {
-      fetchPurchases();
-    }
-  }, [activeTab]);
-
-  // Fetch services when services tab is active
-  useEffect(() => {
-    if (activeTab === "services" && services.length === 0) {
-      fetchServices();
-    }
-  }, [activeTab]);
-
-  const fetchPurchases = async () => {
-    setLoadingPurchases(true);
-    try {
-      const { data } = await api.get(`/clients/${client._id}/purchases`);
-      setPurchases(data);
-    } catch (error) {
-      console.log("Error fetching purchases:", error);
-      setPurchases([]); // Set empty array on error
-    } finally {
-      setLoadingPurchases(false);
-    }
-  };
-
-  const fetchServices = async () => {
-    setLoadingServices(true);
-    try {
-      const { data } = await api.get(`/clients/${client._id}/services`);
-      setServices(data);
-    } catch (error) {
-      console.log("Error fetching services:", error);
-      setServices([]); // Set empty array on error
-    } finally {
-      setLoadingServices(false);
-    }
-  };
-
-  // Close modal on ESC key
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsModalOpen(false);
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [setIsModalOpen]);
-
-  // Close on backdrop click
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (e.target === e.currentTarget) setIsModalOpen(false);
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("es-ES", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("es-ES", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
+  const {
+    activeTab,
+    setActiveTab,
+    purchases,
+    services,
+    loadingPurchases,
+    loadingServices,
+    formatDate,
+    formatCurrency,
+    handleBackdropClick,
+  } = useClientDetails({ client, setIsModalOpen });
 
   return (
     <div
